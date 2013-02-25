@@ -1,0 +1,4 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<animation name="rhino-idle">
+  <attributes frameSize.X="280" frameSize.Y="280" sheetSize.X="4" sheetSize.Y="4" totalFrames="13" frameInterval="60" />
+</animation>

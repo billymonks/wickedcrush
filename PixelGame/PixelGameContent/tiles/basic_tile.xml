@@ -1,0 +1,5 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<tile name="TILE_NAME" size_x="256" size_y="256" depth="0">
+  <texture>cavewall5</texture>
+  <normal>grass2normal</normal>
+</tile>

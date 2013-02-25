@@ -1,0 +1,4 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<animation name="tree-idle">
+  <attributes frameSize.X="108" frameSize.Y="150" sheetSize.X="4" sheetSize.Y="4" totalFrames="15" frameInterval="30" />
+</animation>

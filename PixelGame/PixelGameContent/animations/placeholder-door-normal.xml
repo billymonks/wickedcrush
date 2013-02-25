@@ -1,0 +1,4 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<animation name="placeholder-door-normal">
+  <attributes frameSize.X="256" frameSize.Y="256" sheetSize.X="1" sheetSize.Y="1" totalFrames="1" frameInterval="60" />
+</animation>

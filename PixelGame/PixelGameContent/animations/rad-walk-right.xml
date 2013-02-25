@@ -1,0 +1,4 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<animation name="rad-walk-right">
+  <attributes frameSize.X="202" frameSize.Y="211" sheetSize.X="3" sheetSize.Y="4" totalFrames="10" frameInterval="52" />
+</animation>

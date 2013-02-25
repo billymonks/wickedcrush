@@ -1,0 +1,4 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<animation name="rhino-attack">
+  <attributes frameSize.X="280" frameSize.Y="280" sheetSize.X="3" sheetSize.Y="3" totalFrames="9" frameInterval="30" />
+</animation>

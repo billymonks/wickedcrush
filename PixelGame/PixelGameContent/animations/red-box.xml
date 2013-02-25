@@ -1,0 +1,4 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<animation name="red-box">
+  <attributes frameSize.X="19" frameSize.Y="19" sheetSize.X="1" sheetSize.Y="1" totalFrames="1" frameInterval="60" />
+</animation>

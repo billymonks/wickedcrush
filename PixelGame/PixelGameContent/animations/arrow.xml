@@ -1,0 +1,4 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<animation name="arrow">
+  <attributes frameSize.X="100" frameSize.Y="23" sheetSize.X="2" sheetSize.Y="2" totalFrames="3" frameInterval="60" />
+</animation>

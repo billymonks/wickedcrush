@@ -1,0 +1,4 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<animation name="boy_hero_run_melee_tell">
+  <attributes frameSize.X="763" frameSize.Y="385" sheetSize.X="1" sheetSize.Y="2" totalFrames="2" frameInterval="5" />
+</animation>

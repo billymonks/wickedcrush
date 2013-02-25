@@ -1,0 +1,4 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<animation name="boy_hero_block">
+  <attributes frameSize.X="224" frameSize.Y="227" sheetSize.X="2" sheetSize.Y="2" totalFrames="3" frameInterval="80" />
+</animation>

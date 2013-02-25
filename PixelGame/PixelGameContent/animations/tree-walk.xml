@@ -1,0 +1,4 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<animation name="tree-walk">
+  <attributes frameSize.X="108" frameSize.Y="150" sheetSize.X="2" sheetSize.Y="3" totalFrames="6" frameInterval="30" />
+</animation>

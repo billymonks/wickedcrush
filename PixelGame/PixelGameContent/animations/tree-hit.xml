@@ -1,0 +1,4 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<animation name="tree-hit">
+  <attributes frameSize.X="108" frameSize.Y="150" sheetSize.X="1" sheetSize.Y="1" totalFrames="1" frameInterval="30" />
+</animation>

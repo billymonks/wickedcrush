@@ -1,0 +1,4 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<animation name="boy_hero_block_walk_fwd">
+  <attributes frameSize.X="224" frameSize.Y="227" sheetSize.X="5" sheetSize.Y="6" totalFrames="28" frameInterval="25" />
+</animation>

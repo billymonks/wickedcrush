@@ -1,0 +1,4 @@
+D:\Users\Billy\Documents\Visual Studio 2010\Projects\PixelGame\Raditor\RaditorContent\obj\x86\Debug\ResolveAssemblyReference.cache
+I:\PixelGame\Raditor\RaditorContent\obj\x86\Debug\ResolveAssemblyReference.cache
+D:\Users\Billy\Desktop\PixelGame\Raditor\RaditorContent\obj\x86\Debug\ResolveAssemblyReference.cache
+H:\PixelGame\Raditor\RaditorContent\obj\x86\Debug\ResolveAssemblyReference.cache

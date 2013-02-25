@@ -1,0 +1,4 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<animation name="bird-right">
+  <attributes frameSize.X="100" frameSize.Y="100" sheetSize.X="2" sheetSize.Y="3" totalFrames="5" frameInterval="30" />
+</animation>

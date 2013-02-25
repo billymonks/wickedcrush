@@ -1,0 +1,4 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<animation name="rad-jump-down-right">
+  <attributes frameSize.X="202" frameSize.Y="211" sheetSize.X="1" sheetSize.Y="1" totalFrames="1" frameInterval="60" />
+</animation>

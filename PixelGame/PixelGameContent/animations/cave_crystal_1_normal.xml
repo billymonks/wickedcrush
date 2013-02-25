@@ -1,0 +1,4 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<animation name="cave_crystal_1_normal">
+  <attributes frameSize.X="512" frameSize.Y="512" sheetSize.X="1" sheetSize.Y="1" totalFrames="1" frameInterval="60" />
+</animation>

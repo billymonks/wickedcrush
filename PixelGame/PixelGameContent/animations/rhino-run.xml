@@ -1,0 +1,4 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<animation name="rhino-run">
+  <attributes frameSize.X="280" frameSize.Y="280" sheetSize.X="2" sheetSize.Y="3" totalFrames="5" frameInterval="60" />
+</animation>
