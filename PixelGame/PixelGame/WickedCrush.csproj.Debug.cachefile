@@ -241,6 +241,7 @@ Content\animations\tree-attack.xml
 Content\animations\tree-hit.xml
 Content\animations\tree-idle.xml
 Content\animations\tree-walk.xml
+Content\levels\ULTIMATECHALLENGEEE.xml
 Content\materials\stone.xml
 Content\tiles\basic_tile.xml
 Content\tiles\edgeless_tile.xml
