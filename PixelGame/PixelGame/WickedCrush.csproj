@@ -151,7 +151,7 @@
     <Compile Include="Utility\Menu.cs" />
     <Compile Include="Utility\MenuOption.cs" />
     <Compile Include="GameEntities\Platform.cs" />
-    <Compile Include="Depricated\PlayerCharacter.cs" />
+    <Compile Include="Deprecated\PlayerCharacter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utility\Program.cs" />
     <Compile Include="Utility\Main.cs" />

@@ -29,7 +29,7 @@ namespace WickedCrush.GameStates
         Overlord _overlord;
         Matrix scaleMatrix;
 
-        int gridSize = 32;
+        int gridSize = 64;
         int brushSize = 0;
         int maxBrushSize = 3;
 
@@ -679,7 +679,7 @@ namespace WickedCrush.GameStates
 
             tempEntity = new EntityInEditor();
             tempEntity.entName = "TreeMob";
-            tempEntity.size = new Point(3, 2); //row, col
+            tempEntity.size = new Point(2, 1); //row, col
             tempEntity.gridPos = new Point(0, 0);
             tempEntity.dangerRating = 5;
             tempEntity.flipEnabled = true;
@@ -693,7 +693,7 @@ namespace WickedCrush.GameStates
 
             tempEntity = new EntityInEditor();
             tempEntity.entName = "Rhino";
-            tempEntity.size = new Point(5, 4); //row, col
+            tempEntity.size = new Point(3, 2); //row, col
             tempEntity.gridPos = new Point(0, 0);
             tempEntity.dangerRating = 10;
             tempEntity.flipEnabled = true;
@@ -707,7 +707,7 @@ namespace WickedCrush.GameStates
 
             tempEntity = new EntityInEditor();
             tempEntity.entName = "Birdy";
-            tempEntity.size = new Point(2, 2); //row, col
+            tempEntity.size = new Point(1, 1); //row, col
             tempEntity.gridPos = new Point(0, 0);
             tempEntity.dangerRating = 5;
             tempEntity.flipEnabled = true;
@@ -762,7 +762,7 @@ namespace WickedCrush.GameStates
 
             tempEntity = new EntityInEditor();
             tempEntity.entName = "Level_Entrance";
-            tempEntity.size = new Point(4, 4); //row, col
+            tempEntity.size = new Point(2, 2); //row, col
             tempEntity.gridPos = new Point(0, 0);
             tempEntity.dangerRating = 0;
             tempEntity.flipEnabled = false;
@@ -776,7 +776,7 @@ namespace WickedCrush.GameStates
 
             tempEntity = new EntityInEditor();
             tempEntity.entName = "Level_Exit";
-            tempEntity.size = new Point(4, 4); //row, col
+            tempEntity.size = new Point(2, 2); //row, col
             tempEntity.gridPos = new Point(0, 0);
             tempEntity.dangerRating = 0;
             tempEntity.flipEnabled = false;
@@ -1125,8 +1125,8 @@ namespace WickedCrush.GameStates
                 entities.Add(new XElement("entity",
                         new XAttribute("name", e.entName),
                         new XAttribute("type", "Character"),
-                        new XAttribute("xPos", e.gridPos.X*32),
-                        new XAttribute("yPos", e.gridPos.Y*32 - (e.size.Y-1)*32),
+                        new XAttribute("xPos", e.gridPos.X*gridSize),
+                        new XAttribute("yPos", e.gridPos.Y * gridSize - (e.size.Y - 1) * gridSize),
                         new XAttribute("direction", dir)));
 
             }
