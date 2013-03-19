@@ -1,5 +1,0 @@
-D:\Users\Billy\Documents\Visual Studio 2010\Projects\PixelGame\PixelGame\PixelGameContent\obj\x86\Debug\ResolveAssemblyReference.cache
-I:\PixelGame\PixelGame\PixelGameContent\obj\x86\Debug\ResolveAssemblyReference.cache
-D:\Users\Billy\Desktop\PixelGame\PixelGame\PixelGameContent\obj\x86\Debug\ResolveAssemblyReference.cache
-H:\PixelGame\PixelGame\PixelGameContent\obj\x86\Debug\ResolveAssemblyReference.cache
-D:\Users\Billy\Documents\GitHub\wickedcrush\PixelGame\PixelGameContent\obj\x86\Debug\ResolveAssemblyReference.cache
