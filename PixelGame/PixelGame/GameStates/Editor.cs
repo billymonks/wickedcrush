@@ -604,22 +604,24 @@ namespace WickedCrush.GameStates
             {
                 tempEntity.facing = editorDirection;
                 entityList.Add(tempEntity);
-            }
+            
 
-            for (int i = 0; i < tempEntity.size.Y; i++)
-            {
-                for (int j = 0; j < tempEntity.size.X; j++)
-                    solidGeom[tempEntity.gridPos.Y - j, tempEntity.gridPos.X + i] = 2;
-                if(tempEntity.connectionPoint.Equals(Direction.Down))
-                    solidGeom[tempEntity.gridPos.Y - tempEntity.size.X, tempEntity.gridPos.X + i] = 3;
-            }
+                for (int i = 0; i < tempEntity.size.Y; i++)
+                {
+                    for (int j = 0; j < tempEntity.size.X; j++)
+                        solidGeom[tempEntity.gridPos.Y - j, tempEntity.gridPos.X + i] = 2;
+                    if(tempEntity.connectionPoint.Equals(Direction.Down))
+                        solidGeom[tempEntity.gridPos.Y - tempEntity.size.X, tempEntity.gridPos.X + i] = 3;
+                }
 
 
-            NewEntity();
+                NewEntity();
             
             
 
-            UpdateDangerLevel();
+                UpdateDangerLevel();
+
+            }
         }
 
         private void NewEntity()
