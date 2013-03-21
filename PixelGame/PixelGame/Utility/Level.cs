@@ -262,7 +262,6 @@ namespace WickedCrush
             solidGeomTex = compileTex(_overlord._cm, _overlord._gd, texList, out texLookupList, 64);
             solidGeomNorm = compileTex(_overlord._cm, _overlord._gd, normList, out normLookupList, 64);
 
-            //createSolidGeomVertices(blockList, tileList); // gonna be a doozy
             createSolidGeomVertices(matList);
 
             if (solidGeomVertices.Length > 0)
@@ -428,79 +427,10 @@ namespace WickedCrush
             setupCamera();
         }
 
-        public void extendSGCD(int newRows, int newCols)
-        {
-            int rows = newRows;
-            int cols = newCols;
-
-            if (sGCD.GetLength(0) > rows)
-                rows = sGCD.GetLength(0);
-            else
-                rows++;
-
-            if (sGCD.GetLength(1) > cols)
-                cols = sGCD.GetLength(1);
-            else
-                cols++;
-
-            Platform[,] oldSGCD = sGCD;
-            String[,] oldBG = levelBackgrounds;
-            String[,] oldFG = levelForegrounds;
-
-            sGCD = new Platform[rows, cols];
-            levelBackgrounds = new String[rows, cols];
-            levelForegrounds = new String[rows, cols];
-
-            for (int i = 0; i < oldSGCD.GetLength(0); i++)
-                for (int j = 0; j < oldSGCD.GetLength(1); j++)
-                {
-                    sGCD[i, j] = oldSGCD[i, j];
-                    levelBackgrounds[i, j] = oldBG[i, j];
-                    levelForegrounds[i, j] = oldFG[i, j];
-                }
-
-            
-        }
-
-        
-
-        public void addBlockToList(String blockName, List<Block> blockList)
-        {
-            Block tempBlock = new Block();
-            tempBlock.loadBlock(blockName);
-            blockList.Add(tempBlock);
-        }
-        public List<Block> removeDupesFromBlockList(List<Block> blockList)
-        {
-            List<Block> newBlockList = blockList.Distinct().ToList<Block>(); //what wrong what what
-            return newBlockList;
-        }
-
-        public List<Tile> removeDupesFromTileList(List<Tile> tileList)
-        {
-            List<Tile> newTileList = tileList.Distinct().ToList<Tile>(); //what wrong what what
-            return newTileList;
-        }
-
         public List<Material> removeDupesFromMatList(List<Material> matList)
         {
             List<Material> newMatList = matList.Distinct().ToList<Material>();
             return newMatList;
-        }
-
-        public Block blockSelection(String blockName, List<Block> blockList)
-        {
-            Block tempBlock = new Block();
-            foreach (Block b in blockList)
-            {
-                if (b.name.Equals(blockName))
-                {
-                    tempBlock = b;
-                    return tempBlock;
-                }
-            }
-
-            return null;
         }
 
         public Material matSelection(String matName, List<Material> matList)
@@ -627,15 +557,6 @@ namespace WickedCrush
                         }
                     }
                 }
-                /*foreach (MatTex t in m.textures)
-                {
-                    if (t.index < 48)
-                    {
-                        tempTex = cm.Load<Texture2D>("textures//" + t.texName);
-                        tempTex.Name = t.texName;
-                        textureList.Add(tempTex);
-                    }
-                }*/
             }
             
             textureList = textureList.Distinct<Texture2D>().ToList<Texture2D>();
@@ -659,43 +580,13 @@ namespace WickedCrush
                         }
                     }
                 }
-                /*foreach (MatTex t in m.textures)
-                {
-                    if (t.index > 47)
-                    {
-                        tempNorm = cm.Load<Texture2D>("normals//" + t.texName);
-                        tempNorm.Name = t.texName;
-                        normalList.Add(tempNorm);
-                    }
-                }*/
                 
             }
 
             normalList = normalList.Distinct<Texture2D>().ToList<Texture2D>();
             return normalList;
         }
-        public void getCompleteBlockList(List<Block> completeBlockList)
-        {
-            Block tempBlock;
-            string[] files = System.IO.Directory.GetFiles(@"Content/blocks", "*", SearchOption.AllDirectories);
-            foreach (String s in files)
-            {
-                tempBlock = new Block();
-                tempBlock.loadBlock(s);
-                completeBlockList.Add(tempBlock);
-            }
-        }
-        public void getCompleteTileList(List<Tile> completeTileList)
-        {
-            Tile tempTile;
-            string[] files = System.IO.Directory.GetFiles(@"Content/tiles", "*", SearchOption.AllDirectories);
-            foreach (String s in files)
-            {
-                tempTile = new Tile();
-                tempTile.loadTile(s);
-                completeTileList.Add(tempTile);
-            }
-        }
+
         public void getCompleteMatList(List<Material> completeMatList)
         {
             Material tempMat;
@@ -707,104 +598,7 @@ namespace WickedCrush
                 completeMatList.Add(tempMat);
             }
         }
-        /*public void createSolidGeomVertices(List<Block> blockList,
-            List<Tile> tileList) // todo: cull unseen side surfaces hiden within geometry (top and bottom complete)
-        {
-            List<VertexPositionNormalTextureTangentBinormal> tempVertList = new List<VertexPositionNormalTextureTangentBinormal>();
-
-            Block tempBlock;
-            Tile tempTile;
-            VertexPositionNormalTextureTangentBinormal[] tempVerts;
-
-            int k;
-
-            for (int i = 0; i < sGCD.GetLength(0); i++)
-            {
-                for (int j = 0; j < sGCD.GetLength(1); j++)
-                {
-                    if (sGCD[i, j] != null)
-                    {
-                        tempBlock = blockSelection(sGCD[i, j].blockName, blockList);
-
-                        if (i == sGCD.GetLength(0)-1 || sGCD[i + 1, j] == null || !(tempBlock.cTop && blockSelection(sGCD[i + 1, j].blockName, blockList).cBottom))
-                        {
-                            tempVerts = tempBlock.getTopFace(); //top face
-                            transformSurfaceToPosition(tempVerts, i, j); //transform to proper position
-                            adjustTextureCoordinates(tempVerts, tempBlock.tTop); //transform textures to proper coordinates
-                            adjustNormalCoordinates(tempVerts, tempBlock.nTop); //transform normals to proper coordinates
-
-                            //add tempVerts
-                            for (k = 0; k < tempVerts.Length; k++)
-                                tempVertList.Add(tempVerts[k]);
-                        }
-
-                        tempVerts = tempBlock.getFrontFace(); //front face
-                        transformSurfaceToPosition(tempVerts, i, j); //transform to proper position
-                        adjustTextureCoordinates(tempVerts, tempBlock.tFront); //transform textures to proper coordinates
-                        adjustNormalCoordinates(tempVerts, tempBlock.nFront); //transform normals to proper coordinates
-
-                        //add tempVerts
-                        for (k = 0; k < tempVerts.Length; k++)
-                            tempVertList.Add(tempVerts[k]);
-
-                        tempVerts = tempBlock.getLeftFace(); //left face
-                        transformSurfaceToPosition(tempVerts, i, j); //transform to proper position
-                        adjustTextureCoordinates(tempVerts, tempBlock.tLeft); //transform textures to proper coordinates
-                        adjustNormalCoordinates(tempVerts, tempBlock.nLeft); //transform normals to proper coordinates
-
-                        //add tempVerts
-                        for (k = 0; k < tempVerts.Length; k++)
-                            tempVertList.Add(tempVerts[k]);
-
-                        tempVerts = tempBlock.getRightFace(); //right face
-                        transformSurfaceToPosition(tempVerts, i, j); //transform to proper position
-                        adjustTextureCoordinates(tempVerts, tempBlock.tRight); //transform textures to proper coordinates
-                        adjustNormalCoordinates(tempVerts, tempBlock.nRight); //transform normals to proper coordinates
-
-                        //add tempVerts
-                        for (k = 0; k < tempVerts.Length; k++)
-                            tempVertList.Add(tempVerts[k]);
-
-                        if (i == 0 || sGCD[i - 1, j] == null || !(tempBlock.cBottom && blockSelection(sGCD[i - 1, j].blockName, blockList).cTop))
-                        {
-                            tempVerts = tempBlock.getBottomFace(); //bottom face
-                            transformSurfaceToPosition(tempVerts, i, j); //transform to proper position
-                            adjustTextureCoordinates(tempVerts, tempBlock.tBottom); //transform textures to proper coordinates
-                            adjustNormalCoordinates(tempVerts, tempBlock.nBottom); //transform normals to proper coordinates
-
-                            //add tempVerts
-                            for (k = 0; k < tempVerts.Length; k++)
-                                tempVertList.Add(tempVerts[k]);
-                        }
-
-                    }
-                    if (levelBackgrounds[i, j] != null)
-                    {
-                        tempTile = tileSelection(levelBackgrounds[i, j], tileList);
-                        tempVerts = tempTile.getFace();
-                        transformBackgroundSurfaceToPosition(tempVerts, i, j);
-                        adjustTextureCoordinates(tempVerts, tempTile.tex);
-                        adjustNormalCoordinates(tempVerts, tempTile.norm);
-
-                        for (k = 0; k < tempVerts.Length; k++)
-                            tempVertList.Add(tempVerts[k]);
-                    }
-                    if (levelForegrounds[i, j] != null)
-                    {
-                        tempTile = tileSelection(levelForegrounds[i, j], tileList);
-                        tempVerts = tempTile.getFace();
-                        transformForegroundSurfaceToPosition(tempVerts, i, j);
-                        adjustTextureCoordinates(tempVerts, tempTile.tex);
-                        adjustNormalCoordinates(tempVerts, tempTile.norm);
-
-                        for (k = 0; k < tempVerts.Length; k++)
-                            tempVertList.Add(tempVerts[k]);
-                    }
-                }
-            }
-
-            solidGeomVertices = tempVertList.ToArray();
-        }*/
+       
 
         public void createSolidGeomVertices(List<Material> matList) //a doozy
         {

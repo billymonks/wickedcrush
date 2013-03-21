@@ -137,7 +137,7 @@
     <Compile Include="GameStates\SplashScreen.cs" />
     <Compile Include="Utility\SynchronizedContentManager.cs" />
     <Compile Include="Utility\Tile.cs" />
-    <Compile Include="Utility\Block.cs" />
+    <Compile Include="Deprecated\Block.cs" />
     <Compile Include="Utility\Camera.cs" />
     <Compile Include="Utility\Character.cs" />
     <Compile Include="Utility\CharacterFactory.cs" />

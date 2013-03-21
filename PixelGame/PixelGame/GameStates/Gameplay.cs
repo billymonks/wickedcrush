@@ -444,6 +444,7 @@ namespace WickedCrush.GameStates
                         {
                             if (currentLevel.characterList[i].checkCollision(currentLevel.sGCD[k, l])
                                 || currentLevel.characterList[i].checkFeetCollision(currentLevel.sGCD[k, l]))
+                                //if (currentLevel.sGCD[k, l].checkDetailedCollision(currentLevel.characterList[i]))
                                 if (currentLevel.sGCD[k, l].checkDetailedCollision(currentLevel.characterList[i]))
                                     currentLevel.characterList[i].collisionList.Add(currentLevel.sGCD[k, l]);
 
