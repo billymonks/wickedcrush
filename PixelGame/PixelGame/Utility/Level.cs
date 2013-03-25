@@ -254,6 +254,14 @@ namespace WickedCrush
                 matList.Add(matSelection(elementName, completeMatList));
             }
 
+/*            sGCD[53, 12] = new Ramp(12 * gridSize, 53 * gridSize, gridSize + 1, gridSize, Corner.BottomLeft, matSelection("stone", completeMatList));
+
+            sGCD[56, 12] = new Ramp(12 * gridSize, 56 * gridSize, gridSize + 1, gridSize, Corner.TopLeft, matSelection("stone", completeMatList));
+
+            sGCD[53, 18] = new Ramp(18 * gridSize, 53 * gridSize, gridSize + 1, gridSize, Corner.BottomRight, matSelection("stone", completeMatList));
+
+            sGCD[56, 18] = new Ramp(18 * gridSize, 56 * gridSize, gridSize + 1, gridSize, Corner.TopRight, matSelection("stone", completeMatList));*/
+
             matList = removeDupesFromMatList(matList);
 
             texList = getTextureList(matList, _overlord._cm);
@@ -615,25 +623,11 @@ namespace WickedCrush
             {
                 for (int j = 0; j < sGCD.GetLength(1); j++)
                 {
-                    if (sGCD[i, j] != null)
+                    if (sGCD[i, j] != null && sGCD[i, j].type.Equals(EntType.Platform))
                     {
                         tempMat = matSelection(sGCD[i, j].matName, matList);
 
-                        if(i!=sGCD.GetLength(0)-1 && sGCD[i+1,j] == null)
-                            for (l = 0; l < 8; l++)
-                            {
-                                tempVerts = tempMat.getTopFace((float)l); //top face
-                                transformSurfaceToPosition(tempVerts, i, j); //transform to proper position
-                                adjustTextureCoordinates(tempVerts, tempMat.textures[16][0][0]);
-                                adjustNormalCoordinates(tempVerts, GetTopTextureName(tempMat, i, j, l));
-
-                                //add tempVerts
-                                for (k = 0; k < tempVerts.Length; k++)
-                                    tempVertList.Add(tempVerts[k]);
-                            }
-
-
-                        tempVerts = tempMat.getFrontFace(8f); //front face
+                        tempVerts = tempMat.getFrontFace(4f); //front face
                         transformSurfaceToPosition(tempVerts, i, j); //transform to proper position
                         adjustTextureCoordinates(tempVerts, tempMat.textures[0][0][0]); //needs change to choose correct tex and norm
                         adjustNormalCoordinates(tempVerts, GetFrontTextureName(tempMat, i, j)); //tempMat.textures[48][0][0]);
@@ -642,45 +636,74 @@ namespace WickedCrush
                         for (k = 0; k < tempVerts.Length; k++)
                             tempVertList.Add(tempVerts[k]);
 
-                        if (j != 0 && sGCD[i, j - 1] == null)
-                            for (l = 0; l < 8; l++)
-                            {
-                                tempVerts = tempMat.getLeftFace((float)l); //left face
-                                transformSurfaceToPosition(tempVerts, i, j); //transform to proper position
-                                adjustTextureCoordinates(tempVerts, tempMat.textures[0][0][0]);
-                                adjustNormalCoordinates(tempVerts, tempMat.textures[48][0][0]);
+                        if (!_overlord.isOrtho)
+                        {
+                            if (i != sGCD.GetLength(0) - 1 && sGCD[i + 1, j] == null)
+                                for (l = 0; l < 4; l++)
+                                {
+                                    tempVerts = tempMat.getTopFace((float)l); //top face
+                                    transformSurfaceToPosition(tempVerts, i, j); //transform to proper position
+                                    adjustTextureCoordinates(tempVerts, tempMat.textures[16][0][0]);
+                                    adjustNormalCoordinates(tempVerts, GetTopTextureName(tempMat, i, j, l));
 
-                                //add tempVerts
-                                for (k = 0; k < tempVerts.Length; k++)
-                                    tempVertList.Add(tempVerts[k]);
-                            }
+                                    //add tempVerts
+                                    for (k = 0; k < tempVerts.Length; k++)
+                                        tempVertList.Add(tempVerts[k]);
+                                }
 
-                        if (j != sGCD.GetLength(1)-1 && sGCD[i, j+1] == null) //note
-                            for (l = 0; l < 8; l++)
-                            {
-                                tempVerts = tempMat.getRightFace((float)l); //right face
-                                transformSurfaceToPosition(tempVerts, i, j); //transform to proper position
-                                adjustTextureCoordinates(tempVerts, tempMat.textures[0][0][0]);
-                                adjustNormalCoordinates(tempVerts, tempMat.textures[48][0][0]);
+                            if (j != 0 && sGCD[i, j - 1] == null)
+                                for (l = 0; l < 4; l++)
+                                {
+                                    tempVerts = tempMat.getLeftFace((float)l); //left face
+                                    transformSurfaceToPosition(tempVerts, i, j); //transform to proper position
+                                    adjustTextureCoordinates(tempVerts, tempMat.textures[0][0][0]);
+                                    adjustNormalCoordinates(tempVerts, tempMat.textures[48][0][0]);
 
-                                //add tempVerts
-                                for (k = 0; k < tempVerts.Length; k++)
-                                    tempVertList.Add(tempVerts[k]);
-                            }
+                                    //add tempVerts
+                                    for (k = 0; k < tempVerts.Length; k++)
+                                        tempVertList.Add(tempVerts[k]);
+                                }
 
-                        if (i != 0 && sGCD[i - 1, j] == null)
-                            for (l = 0; l < 8; l++)
-                            {
-                                tempVerts = tempMat.getBottomFace((float)l); //bottom face
-                                transformSurfaceToPosition(tempVerts, i, j); //transform to proper position
-                                adjustTextureCoordinates(tempVerts, tempMat.textures[32][0][0]);
-                                adjustNormalCoordinates(tempVerts, GetBottomTextureName(tempMat,i,j,l));
+                            if (j != sGCD.GetLength(1) - 1 && sGCD[i, j + 1] == null) //note
+                                for (l = 0; l < 4; l++)
+                                {
+                                    tempVerts = tempMat.getRightFace((float)l); //right face
+                                    transformSurfaceToPosition(tempVerts, i, j); //transform to proper position
+                                    adjustTextureCoordinates(tempVerts, tempMat.textures[0][0][0]);
+                                    adjustNormalCoordinates(tempVerts, tempMat.textures[48][0][0]);
 
-                                //add tempVerts
-                                for (k = 0; k < tempVerts.Length; k++)
-                                    tempVertList.Add(tempVerts[k]);
-                            }
+                                    //add tempVerts
+                                    for (k = 0; k < tempVerts.Length; k++)
+                                        tempVertList.Add(tempVerts[k]);
+                                }
 
+                            if (i != 0 && sGCD[i - 1, j] == null)
+                                for (l = 0; l < 4; l++)
+                                {
+                                    tempVerts = tempMat.getBottomFace((float)l); //bottom face
+                                    transformSurfaceToPosition(tempVerts, i, j); //transform to proper position
+                                    adjustTextureCoordinates(tempVerts, tempMat.textures[32][0][0]);
+                                    adjustNormalCoordinates(tempVerts, GetBottomTextureName(tempMat, i, j, l));
+
+                                    //add tempVerts
+                                    for (k = 0; k < tempVerts.Length; k++)
+                                        tempVertList.Add(tempVerts[k]);
+                                }
+                        }
+
+                    }
+                    else if (sGCD[i, j] != null && sGCD[i, j].type.Equals(EntType.Ramp))
+                    {
+                        tempMat = matSelection(sGCD[i, j].matName, matList);
+
+                        tempVerts = tempMat.getFrontFace(4f, ((Ramp)sGCD[i, j]).corner); //front face
+                        transformSurfaceToPosition(tempVerts, i, j); //transform to proper position
+                        adjustTextureCoordinates(tempVerts, tempMat.textures[0][0][0]); //needs change to choose correct tex and norm
+                        adjustNormalCoordinates(tempVerts, GetFrontTextureName(tempMat, i, j)); //tempMat.textures[48][0][0]);
+
+                        //add tempVerts
+                        for (k = 0; k < tempVerts.Length; k++)
+                            tempVertList.Add(tempVerts[k]);
                     }
                     else //background
                     {

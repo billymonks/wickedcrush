@@ -8,6 +8,13 @@ using WickedCrush.GameStates;
 
 namespace WickedCrush.Utility
 {
+    public enum Corner
+    {
+        TopLeft = 0,
+        TopRight = 1,
+        BottomRight = 2,
+        BottomLeft = 3
+    }
     public struct MatTex
     {
         public byte index;
@@ -130,6 +137,132 @@ namespace WickedCrush.Utility
                 binormal);
             vertices[4] = vertices[0];
             vertices[5] = vertices[2];
+
+            return vertices;
+        }
+
+        public VertexPositionNormalTextureTangentBinormal[] getFrontFace(float depth, Corner corner)
+        {
+            VertexPositionNormalTextureTangentBinormal[] vertices;
+            Vector3 normal, tangent, binormal;
+
+            normal = new Vector3(0f, 0f, 1f);
+            tangent = new Vector3(0f, 1f, 0f);
+            binormal = Vector3.Cross(tangent, normal);
+
+            vertices = new VertexPositionNormalTextureTangentBinormal[3];
+
+            switch (corner)
+            {
+                case Corner.BottomLeft:
+                    //top front left
+                    vertices[0] = new VertexPositionNormalTextureTangentBinormal(
+                        new Vector4(0f, 1f, depth, 1f),
+                        normal,
+                        new Vector2(0f, 0f),
+                        new Vector2(0f, 0f),
+                        tangent,
+                        binormal);
+                    //bottom front left
+                    vertices[1] = new VertexPositionNormalTextureTangentBinormal(
+                        new Vector4(0f, 0f, depth, 1f),
+                        normal,
+                        new Vector2(0f, 1f),
+                        new Vector2(0f, 1f),
+                        tangent,
+                        binormal);
+                    //bottom front right
+                    vertices[2] = new VertexPositionNormalTextureTangentBinormal(
+                        new Vector4(1f, 0f, depth, 1f),
+                        normal,
+                        new Vector2(1f, 1f),
+                        new Vector2(1f, 1f),
+                        tangent,
+                        binormal);
+                    break;
+
+                case Corner.BottomRight:
+                    //bottom front left
+                    vertices[0] = new VertexPositionNormalTextureTangentBinormal(
+                        new Vector4(0f, 0f, depth, 1f),
+                        normal,
+                        new Vector2(0f, 1f),
+                        new Vector2(0f, 1f),
+                        tangent,
+                        binormal);
+                    //bottom front right
+                    vertices[1] = new VertexPositionNormalTextureTangentBinormal(
+                        new Vector4(1f, 0f, depth, 1f),
+                        normal,
+                        new Vector2(1f, 1f),
+                        new Vector2(1f, 1f),
+                        tangent,
+                        binormal);
+                    //top front right
+                    vertices[2] = new VertexPositionNormalTextureTangentBinormal(
+                        new Vector4(1f, 1f, depth, 1f),
+                        normal,
+                        new Vector2(1f, 0f),
+                        new Vector2(1f, 0f),
+                        tangent,
+                        binormal);
+                    break;
+
+                case Corner.TopLeft:
+                    //top front left
+                    vertices[0] = new VertexPositionNormalTextureTangentBinormal(
+                        new Vector4(0f, 1f, depth, 1f),
+                        normal,
+                        new Vector2(0f, 0f),
+                        new Vector2(0f, 0f),
+                        tangent,
+                        binormal);
+                    //bottom front left
+                    vertices[1] = new VertexPositionNormalTextureTangentBinormal(
+                        new Vector4(0f, 0f, depth, 1f),
+                        normal,
+                        new Vector2(0f, 1f),
+                        new Vector2(0f, 1f),
+                        tangent,
+                        binormal);
+                    //top front right
+                    vertices[2] = new VertexPositionNormalTextureTangentBinormal(
+                        new Vector4(1f, 1f, depth, 1f),
+                        normal,
+                        new Vector2(1f, 0f),
+                        new Vector2(1f, 0f),
+                        tangent,
+                        binormal);
+                    break;
+
+                case Corner.TopRight:
+                    //top front right
+                    vertices[0] = new VertexPositionNormalTextureTangentBinormal(
+                        new Vector4(1f, 1f, depth, 1f),
+                        normal,
+                        new Vector2(1f, 0f),
+                        new Vector2(1f, 0f),
+                        tangent,
+                        binormal);
+                    //top front left
+                    vertices[1] = new VertexPositionNormalTextureTangentBinormal(
+                        new Vector4(0f, 1f, depth, 1f),
+                        normal,
+                        new Vector2(0f, 0f),
+                        new Vector2(0f, 0f),
+                        tangent,
+                        binormal);
+                    //bottom front right
+                    vertices[2] = new VertexPositionNormalTextureTangentBinormal(
+                        new Vector4(1f, 0f, depth, 1f),
+                        normal,
+                        new Vector2(1f, 1f),
+                        new Vector2(1f, 1f),
+                        tangent,
+                        binormal);
+                    break;
+            }
+            
 
             return vertices;
         }

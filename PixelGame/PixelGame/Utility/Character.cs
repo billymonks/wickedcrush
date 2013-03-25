@@ -30,14 +30,14 @@ namespace WickedCrush
         public Direction facingDir = Direction.Right;
 
         public Rectangle underFeetSensors;
-        private const int SENSOR_HEIGHT = 10;
+        private const int SENSOR_HEIGHT = 20;
         private const float GRAVITY = 0.25f;
 
-        public Line ceilingSensor, wallSensor, floorSensor, leftWallSensor, rightWallSensor;
+        public Line ceilingSensor, wallSensor, floorSensor, leftFloorSensor, rightFloorSensor, leftWallSensor, rightWallSensor;
         public bool leftWallHit, rightWallHit, platformLeft, platformRight;
         public Rectangle leftTouchedRectangle, rightTouchedRectangle;
 
-        public List<Rectangle> underFeetCollisionList;
+        public List<Entity> underFeetCollisionList;
 
         public bool walkThrough = false;
         public bool ignorePlatforms = false;
@@ -84,7 +84,7 @@ namespace WickedCrush
             depth = 128f; //half of gridSize, static for now
 
             collisionList = new List<Entity>();
-            underFeetCollisionList = new List<Rectangle>();
+            underFeetCollisionList = new List<Entity>();
 
             currentAnimationNorm = null;
 
@@ -111,7 +111,7 @@ namespace WickedCrush
             depth = 128f; //half of gridSize, static for now
 
             collisionList = new List<Entity>();
-            underFeetCollisionList = new List<Rectangle>();
+            underFeetCollisionList = new List<Entity>();
 
             currentAnimationNorm = null;
 
@@ -121,7 +121,7 @@ namespace WickedCrush
 
             SetupVertexBuffer(gd);
 
-            centerPoint = new Vector3(pos.X, pos.Y, depth);
+            centerPoint = new Vector3(pos.X - offset.X, pos.Y - offset.Y, depth);
 
             name = "Unnamed_Character";
         }
@@ -140,7 +140,7 @@ namespace WickedCrush
             depth = 128f; //half of gridSize, static for now
 
             collisionList = new List<Entity>();
-            underFeetCollisionList = new List<Rectangle>();
+            underFeetCollisionList = new List<Entity>();
 
             currentAnimationNorm = null;
 
@@ -170,7 +170,7 @@ namespace WickedCrush
             depth = 128f; //half of gridSize, static for now
 
             collisionList = new List<Entity>();
-            underFeetCollisionList = new List<Rectangle>();
+            underFeetCollisionList = new List<Entity>();
 
             currentAnimationNorm = null;
 
@@ -201,7 +201,7 @@ namespace WickedCrush
             this.depth = depth;
 
             collisionList = new List<Entity>();
-            underFeetCollisionList = new List<Rectangle>();
+            underFeetCollisionList = new List<Entity>();
 
             currentAnimationNorm = null;
 
@@ -309,26 +309,28 @@ namespace WickedCrush
 
             ResolveCollisions();
 
-            if (!immobile)
-            {
-                if (leftWallHit)
-                {
-                    pos.X = GetLeftWallFixedPosition();
-                    if (velocity.X < 0f)
-                    velocity.X = 0f;
-                }
-                if (rightWallHit)
-                {
-                    pos.X = GetRightWallFixedPosition();
-                    if (velocity.X > 0f)
-                    velocity.X = 0f;
-                }
-            }
-
             if (sm != null)
             {
                 sm.Update(gameTime, this);
             }
+
+            if (!immobile)
+            {
+                if (leftWallHit)
+                {
+                    //pos.X = GetLeftWallFixedPosition(); //needs improvement
+                    if (velocity.X < 0f)
+                        velocity.X = 0f;
+                }
+                if (rightWallHit)
+                {
+                    //pos.X = GetRightWallFixedPosition(); //needs improvement
+                    if (velocity.X > 0f)
+                        velocity.X = 0f;
+                }
+            }
+
+            
 
             collisionList.Clear();
             underFeetCollisionList.Clear();
@@ -338,8 +340,8 @@ namespace WickedCrush
             velocity += accel * ((float)gameTime.ElapsedGameTime.TotalMilliseconds / 1000.0f) * 60.0f;
             pos += velocity * ((float)gameTime.ElapsedGameTime.TotalMilliseconds / 1000.0f) * 60.0f;
 
-            centerPoint.X = pos.X + offset.X;
-            centerPoint.Y = pos.Y + offset.Y;
+            centerPoint.X = pos.X - offset.X;
+            centerPoint.Y = pos.Y - offset.Y;
             centerPoint.Z = -depth;
 
             EnforceMaxVelocity();
@@ -477,7 +479,7 @@ namespace WickedCrush
                 currentAnimationNorm.Update(gameTime);
         }
 
-        public float GetHighestSensorPoint() // unoptimized but shouldn't be bottleneck
+        public float GetHighestSensorPoint()
         {
             float tempHeight = 0f;
             for (int i = 0; i < underFeetCollisionList.Count; i++)
@@ -486,8 +488,10 @@ namespace WickedCrush
                     tempHeight = underFeetCollisionList[i].resolveHeight((float)underFeetSensors.Left);
                 if (tempHeight < underFeetCollisionList[i].resolveHeight((float)underFeetSensors.Right))
                     tempHeight = underFeetCollisionList[i].resolveHeight((float)underFeetSensors.Right);*/
-                if (underFeetCollisionList[i].Bottom > tempHeight)
-                    tempHeight = underFeetCollisionList[i].Bottom; //kinda weird because 3d y goes up, 2d y goes down
+                if (underFeetCollisionList[i].resolveHeight((float)underFeetSensors.Left) > tempHeight)
+                    tempHeight = underFeetCollisionList[i].resolveHeight((float)underFeetSensors.Left); //kinda weird because 3d y goes up, 2d y goes down
+                if (underFeetCollisionList[i].resolveHeight((float)underFeetSensors.Right) > tempHeight)
+                    tempHeight = underFeetCollisionList[i].resolveHeight((float)underFeetSensors.Right); //kinda weird because 3d y goes up, 2d y goes down
             }
             return tempHeight;
         }
@@ -567,14 +571,22 @@ namespace WickedCrush
         private void InitSensors()
         {
             ceilingSensor = new Line(
-                new Point(hitBox.Left + 10, hitBox.Bottom),
-                new Point(hitBox.Right - 10, hitBox.Bottom));
+                new Point(hitBox.Left+3, hitBox.Bottom),
+                new Point(hitBox.Right-3, hitBox.Bottom));
             wallSensor = new Line(
                 new Point(hitBox.Left, hitBox.Top + SENSOR_HEIGHT),
                 new Point(hitBox.Right, hitBox.Top + SENSOR_HEIGHT));
             floorSensor = new Line(
                 new Point(underFeetSensors.Left, underFeetSensors.Top),
                 new Point(underFeetSensors.Right, underFeetSensors.Top));
+
+            leftFloorSensor = new Line(
+                new Point(underFeetSensors.Left+3, underFeetSensors.Top),
+                new Point(underFeetSensors.Left+3, underFeetSensors.Bottom));
+
+            rightFloorSensor = new Line(
+                new Point(underFeetSensors.Right-3, underFeetSensors.Top),
+                new Point(underFeetSensors.Right-3, underFeetSensors.Bottom));
 
             leftWallSensor = new Line(
                 new Point(hitBox.Left, hitBox.Top + SENSOR_HEIGHT),
@@ -595,8 +607,8 @@ namespace WickedCrush
 
         private void UpdateSensors()
         {
-            ceilingSensor.start.X = hitBox.Left + 10;
-            ceilingSensor.end.X = hitBox.Right - 10;
+            ceilingSensor.start.X = hitBox.Left+3;
+            ceilingSensor.end.X = hitBox.Right-3;
             ceilingSensor.start.Y = hitBox.Bottom;
             ceilingSensor.end.Y = hitBox.Bottom;
 
@@ -605,10 +617,20 @@ namespace WickedCrush
             wallSensor.start.Y = hitBox.Top + SENSOR_HEIGHT;
             wallSensor.end.Y = hitBox.Top + SENSOR_HEIGHT;
 
-            floorSensor.start.X = underFeetSensors.Left;
+            floorSensor.start.X = underFeetSensors.Left+3;
             floorSensor.start.Y = underFeetSensors.Top;
-            floorSensor.end.X = underFeetSensors.Right;
+            floorSensor.end.X = underFeetSensors.Right-3;
             floorSensor.end.Y = underFeetSensors.Top;
+
+            leftFloorSensor.start.X = underFeetSensors.Left+3;
+            leftFloorSensor.start.Y = underFeetSensors.Bottom;
+            leftFloorSensor.end.X = underFeetSensors.Left+3;
+            leftFloorSensor.end.Y = underFeetSensors.Top;
+
+            rightFloorSensor.start.X = underFeetSensors.Right-3;
+            rightFloorSensor.start.Y = underFeetSensors.Bottom;
+            rightFloorSensor.end.X = underFeetSensors.Right-3;
+            rightFloorSensor.end.Y = underFeetSensors.Top;
 
             leftWallSensor.start.X = hitBox.Left-1;
             leftWallSensor.start.Y = hitBox.Top + SENSOR_HEIGHT;
@@ -681,7 +703,7 @@ namespace WickedCrush
 
         public float CheckYDistance(Character c)
         {
-            return Math.Abs(pos.Y - c.pos.Y);
+            return Math.Abs((pos.Y - offset.Y) - (c.pos.Y - c.offset.Y));
         }
 
         public float CheckXDisplacement(Character c)

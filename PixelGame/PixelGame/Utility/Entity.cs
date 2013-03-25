@@ -12,7 +12,8 @@ namespace WickedCrush
         Platform = 0,
         Character = 1,
         Enemy = 2,
-        Collectable = 3
+        Collectable = 3,
+        Ramp = 4
     }
     public abstract class Entity
     {
@@ -31,7 +32,7 @@ namespace WickedCrush
         public abstract Rectangle getHitBox();
 
         // checks the broad hitbox that surrounds every entity
-        public bool checkCollision(Entity e) 
+        public virtual bool checkCollision(Entity e) 
         {
             if (e == null)
                 return false;
@@ -56,6 +57,11 @@ namespace WickedCrush
         {
             //graphicBox.Offset((int)(pos.X - graphicBox.X), (int)(pos.Y - graphicBox.Y));
             //hitBox.Offset((int)(pos.X - graphicBox.X), (int)(pos.Y - graphicBox.Y));
+        }
+
+        public virtual float resolveHeight(float x)
+        {
+            return size.Y+pos.Y;
         }
 
         public float CalculateDistance(Entity e) // a lot of casting, performance?

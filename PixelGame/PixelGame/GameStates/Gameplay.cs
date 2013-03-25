@@ -148,7 +148,9 @@ namespace WickedCrush.GameStates
 
             viewMatrix = Matrix.CreateLookAt(new Vector3(256f, 256f, 1125.0f), new Vector3(256f, 256f, 0f), Vector3.Up);
             //projectionMatrix = Matrix.CreatePerspectiveFieldOfView(MathHelper.PiOver4, (float)_overlord._gd.Viewport.Width / (float)_overlord._gd.Viewport.Height, 0.2f, 1536f);
+            //_overlord.isOrtho = false;
             projectionMatrix = Matrix.CreateOrthographic(1067f, 600f, 0.2f, 1536f);
+            _overlord.isOrtho = true;
             //lightDir = new Vector3(0.1f, -0.6f, -0.6f);
 
             preAlphaFont = _overlord._cm.Load<SpriteFont>(@"fonts/PreAlphaFont");
@@ -420,32 +422,14 @@ namespace WickedCrush.GameStates
                     if (bottomSpot >= currentLevel.sGCD.GetLength(0))
                         bottomSpot = currentLevel.sGCD.GetLength(0) - 1;
 
-                    /*for (int k = 0; k < currentLevel.solidGeom.Count; k++)
-                    {
-                        if (currentLevel.characterList[i].checkCollision(currentLevel.solidGeom[k])
-                                || currentLevel.characterList[i].checkFeetCollision(currentLevel.solidGeom[k]))
-                            if (currentLevel.solidGeom[k].checkDetailedCollision(currentLevel.characterList[i]))
-                                currentLevel.characterList[i].collisionList.Add(currentLevel.solidGeom[k]);
-                    }*/
-                    /*for (int k = 0; k < currentLevel.sGCD.GetLength(0); k++) // check for collisions with solid geom (OBVIOUSLY DEBUG, could be linear)
-                    {
-                        for (int l = 0; l < currentLevel.sGCD.GetLength(1); l++)
-                        {
-                            if (currentLevel.characterList[i].checkCollision(currentLevel.sGCD[k, l])
-                                || currentLevel.characterList[i].checkFeetCollision(currentLevel.sGCD[k, l]))
-                                if (currentLevel.sGCD[k, l].checkDetailedCollision(currentLevel.characterList[i]))
-                                    currentLevel.characterList[i].collisionList.Add(currentLevel.sGCD[k, l]);
-
-                        }
-                    }*/
-                    for (int k = bottomSpot; k < topSpot; k++) // check for collisions with solid geom (OBVIOUSLY DEBUG, could be linear)
+                    for (int k = bottomSpot; k < topSpot; k++)
                     {
                         for (int l = leftSpot; l < rightSpot; l++)
                         {
                             if (currentLevel.characterList[i].checkCollision(currentLevel.sGCD[k, l])
                                 || currentLevel.characterList[i].checkFeetCollision(currentLevel.sGCD[k, l]))
                                 //if (currentLevel.sGCD[k, l].checkDetailedCollision(currentLevel.characterList[i]))
-                                if (currentLevel.sGCD[k, l].checkDetailedCollision(currentLevel.characterList[i]))
+                                if (currentLevel.sGCD[k, l].checkCollision(currentLevel.characterList[i]))
                                     currentLevel.characterList[i].collisionList.Add(currentLevel.sGCD[k, l]);
 
                         }

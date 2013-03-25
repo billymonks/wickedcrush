@@ -60,14 +60,12 @@ namespace WickedCrush.GameEntities
             return hitBox;
         }
 
-        public float resolveHeight(float x)
-        {
-            return size.Y;
-        }
+        //public float resolveHeight(float x)
+        //{
+            //return size.Y;
+        //}
         
-        
-
-        public bool checkDetailedCollision(Entity e)
+        public override bool checkCollision(Entity e) 
         {
             bool hit = false;
             Rectangle eHitBox = e.getHitBox();
@@ -86,21 +84,24 @@ namespace WickedCrush.GameEntities
                 ((Character)e).rightWallHit = true;
                 ((Character)e).rightTouchedRectangle = this.hitBox;
             }
-            else if (e.type.Equals(EntType.Character)
-                    && (this.hitBox.Contains(((Character)e).ceilingSensor.start)
-                    || (this.hitBox.Contains(((Character)e).ceilingSensor.end))))
-            {
-                hit = true;
-                ((Character)e).hitHeadOnCeiling();
-            }
             else
             {
                 if (e.hitBox.Intersects(this.hitBox))
                     hit = true;
                 if (e.type.Equals(EntType.Character)
                     && ((Character)e).underFeetSensors.Intersects(this.hitBox))
-                    ((Character)e).underFeetCollisionList.Add(this.hitBox);
+                    ((Character)e).underFeetCollisionList.Add(this);
             }
+            
+            if (e.type.Equals(EntType.Character)
+                && ((Character)e).ceilingSensor.collision(this.hitBox))
+                    //&& (this.hitBox.Contains(((Character)e).ceilingSensor.start)
+                    //|| (this.hitBox.Contains(((Character)e).ceilingSensor.end))))
+            {
+                hit = true;
+                ((Character)e).hitHeadOnCeiling();
+            }
+            
 
             if (e.type.Equals(EntType.Character)
                     && !((Character)e).platformLeft

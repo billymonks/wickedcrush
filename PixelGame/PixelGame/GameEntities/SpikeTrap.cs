@@ -13,7 +13,7 @@ namespace WickedCrush.GameEntities
     {
 
         public SpikeTrap(ContentManager cm, GraphicsDevice gd, Vector2 pos)
-            : base(pos, new Vector2(32f, 32f), new Vector2(0.5f, 0.5f), new Vector2(-8f, 0f), 128f, gd)
+            : base(pos, new Vector2(64f, 64f), new Vector2(0.5f, 0.5f), new Vector2(-16f, 0f), 128f, gd)
         {
             CreateCharacter(cm);
             walkThrough = false;

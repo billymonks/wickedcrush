@@ -133,6 +133,7 @@
     <Compile Include="Utility\Material.cs" />
     <Compile Include="Utility\Overlord.cs" />
     <Compile Include="Utility\PointLight.cs" />
+    <Compile Include="GameEntities\Ramp.cs" />
     <Compile Include="Utility\SoundManager.cs" />
     <Compile Include="GameStates\SplashScreen.cs" />
     <Compile Include="Utility\SynchronizedContentManager.cs" />

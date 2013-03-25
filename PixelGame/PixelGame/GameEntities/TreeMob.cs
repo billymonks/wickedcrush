@@ -148,7 +148,7 @@ namespace WickedCrush.GameEntities
 
                     if (underFeetCollisionList.Count > 0)
                     {
-                        if (velocity.Y < 0f)
+                        if (velocity.Y <= 0f)
                         {
                             velocity.Y = 0f;
                             this.pos.Y = GetHighestSensorPoint();
@@ -194,7 +194,7 @@ namespace WickedCrush.GameEntities
 
                     if (underFeetCollisionList.Count > 0)
                     {
-                        if (velocity.Y < 0f)
+                        if (velocity.Y <= 0f)
                         {
                             velocity.Y = 0f;
                             this.pos.Y = GetHighestSensorPoint();
@@ -226,7 +226,7 @@ namespace WickedCrush.GameEntities
 
                     if (underFeetCollisionList.Count > 0)
                     {
-                        if (velocity.Y < 0f)
+                        if (velocity.Y <= 0f)
                         {
                             velocity.Y = 0f;
                             this.pos.Y = GetHighestSensorPoint();
@@ -261,7 +261,7 @@ namespace WickedCrush.GameEntities
 
                     if (underFeetCollisionList.Count > 0)
                     {
-                        if (velocity.Y < 0f)
+                        if (velocity.Y <= 0f)
                         {
                             velocity.Y *= -1f;
                             this.pos.Y = GetHighestSensorPoint();
@@ -286,7 +286,7 @@ namespace WickedCrush.GameEntities
 
                     if (underFeetCollisionList.Count > 0)
                     {
-                        if (velocity.Y < 0f)
+                        if (velocity.Y <= 0f)
                         {
                             velocity.Y = 0f;
                             this.pos.Y = GetHighestSensorPoint();

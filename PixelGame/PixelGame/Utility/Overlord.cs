@@ -24,11 +24,13 @@ namespace WickedCrush.Utility
         public User currentUser;
 
         public bool editorMenuOpen;
+        public bool isOrtho;
 
         public Overlord(ContentManager cm, GraphicsDevice gd) // for the editor
         {
             _cm = cm;
             _gd = gd;
+            isOrtho = true;
         }
         
         public Overlord(ContentManager cm, GraphicsDevice gd, SoundManager sound, Stack<GameState> cGameState)
@@ -37,6 +39,7 @@ namespace WickedCrush.Utility
             _gd = gd;
             _sound = sound;
             _cGameState = cGameState;
+            isOrtho = true;
         }
 
         public void returnToLevelMenu()
