@@ -581,12 +581,12 @@ namespace WickedCrush
                 new Point(underFeetSensors.Right, underFeetSensors.Top));
 
             leftFloorSensor = new Line(
-                new Point(underFeetSensors.Left+3, underFeetSensors.Top),
-                new Point(underFeetSensors.Left+3, underFeetSensors.Bottom));
+                new Point(underFeetSensors.Left+2, underFeetSensors.Top),
+                new Point(underFeetSensors.Left+2, underFeetSensors.Bottom));
 
             rightFloorSensor = new Line(
-                new Point(underFeetSensors.Right-3, underFeetSensors.Top),
-                new Point(underFeetSensors.Right-3, underFeetSensors.Bottom));
+                new Point(underFeetSensors.Right-2, underFeetSensors.Top),
+                new Point(underFeetSensors.Right-2, underFeetSensors.Bottom));
 
             leftWallSensor = new Line(
                 new Point(hitBox.Left, hitBox.Top + SENSOR_HEIGHT),
@@ -607,19 +607,19 @@ namespace WickedCrush
 
         private void UpdateSensors()
         {
-            ceilingSensor.start.X = hitBox.Left+3;
-            ceilingSensor.end.X = hitBox.Right-3;
+            ceilingSensor.start.X = hitBox.Left+5;
+            ceilingSensor.end.X = hitBox.Right-5;
             ceilingSensor.start.Y = hitBox.Bottom;
             ceilingSensor.end.Y = hitBox.Bottom;
 
-            wallSensor.start.X = hitBox.Left-1;
-            wallSensor.end.X = hitBox.Right+1;
+            wallSensor.start.X = hitBox.Left;
+            wallSensor.end.X = hitBox.Right;
             wallSensor.start.Y = hitBox.Top + SENSOR_HEIGHT;
             wallSensor.end.Y = hitBox.Top + SENSOR_HEIGHT;
 
-            floorSensor.start.X = underFeetSensors.Left+3;
+            floorSensor.start.X = underFeetSensors.Left+2;
             floorSensor.start.Y = underFeetSensors.Top;
-            floorSensor.end.X = underFeetSensors.Right-3;
+            floorSensor.end.X = underFeetSensors.Right-2;
             floorSensor.end.Y = underFeetSensors.Top;
 
             leftFloorSensor.start.X = underFeetSensors.Left+3;
@@ -627,9 +627,9 @@ namespace WickedCrush
             leftFloorSensor.end.X = underFeetSensors.Left+3;
             leftFloorSensor.end.Y = underFeetSensors.Top;
 
-            rightFloorSensor.start.X = underFeetSensors.Right-3;
+            rightFloorSensor.start.X = underFeetSensors.Right-2;
             rightFloorSensor.start.Y = underFeetSensors.Bottom;
-            rightFloorSensor.end.X = underFeetSensors.Right-3;
+            rightFloorSensor.end.X = underFeetSensors.Right-2;
             rightFloorSensor.end.Y = underFeetSensors.Top;
 
             leftWallSensor.start.X = hitBox.Left-1;
