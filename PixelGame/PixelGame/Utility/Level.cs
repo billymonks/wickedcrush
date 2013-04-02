@@ -205,6 +205,7 @@ namespace WickedCrush
         public void loadLevel(String LEVEL_NAME)
         {
             int row, col;
+            Corner cor = Corner.TopLeft;
             //int x, y;
             String elementName;
             List<Texture2D> texList, normList;
@@ -251,6 +252,32 @@ namespace WickedCrush
                 row = int.Parse(e.Attribute("y").Value);
                 elementName = e.Attribute("mat").Value;
                 sGCD[row, col] = new Platform(col * gridSize, row * gridSize, gridSize+1, gridSize, matSelection(elementName, completeMatList));
+                matList.Add(matSelection(elementName, completeMatList));
+            }
+
+            foreach (XElement e in grid.Elements("ramp"))
+            {
+                col = int.Parse(e.Attribute("x").Value);
+                row = int.Parse(e.Attribute("y").Value);
+                elementName = e.Attribute("mat").Value;
+
+                switch (e.Attribute("corner").Value)
+                {
+                    case "top-left":
+                        cor = Corner.TopLeft;
+                        break;
+                    case "top-right":
+                        cor = Corner.TopRight;
+                        break;
+                    case "bottom-left":
+                        cor = Corner.BottomLeft;
+                        break;
+                    case "bottom-right":
+                        cor = Corner.BottomRight;
+                        break;
+                }
+
+                sGCD[row, col] = new Ramp(col * gridSize, row * gridSize, gridSize + 1, gridSize, cor, matSelection(elementName, completeMatList));
                 matList.Add(matSelection(elementName, completeMatList));
             }
 

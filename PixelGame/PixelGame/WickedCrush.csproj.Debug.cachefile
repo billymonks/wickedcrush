@@ -191,6 +191,10 @@ Content\effects\NormalMappingMultiLights.xnb
 Content\fonts\PreAlphaFont.xnb
 Content\fonts\DamageFont.xnb
 Content\fonts\EditorFont1.xnb
+Content\editor_graphics\sketchy_ramp_bottom_left.xnb
+Content\editor_graphics\sketchy_ramp_bottom_right.xnb
+Content\editor_graphics\sketchy_ramp_top_left.xnb
+Content\editor_graphics\sketchy_ramp_top_right.xnb
 Content\animations\arrow.xml
 Content\animations\assplosion.xml
 Content\animations\bird-right.xml

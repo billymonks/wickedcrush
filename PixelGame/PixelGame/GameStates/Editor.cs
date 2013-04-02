@@ -40,13 +40,14 @@ namespace WickedCrush.GameStates
         Direction editorDirection;
 
         int editorMode; //0 = selection, 1 = geom, 2 = entities, 3 = enemies, 4 = traps
+        bool usingRamps;
 
         int entitySelectionIndex, enemySelectionIndex, trapSelectionIndex;
 
         Vector2 cursorPosition, cameraPosition;
         Point selectedGrid;
 
-        int[,] solidGeom; // 0=blank, 1=geom, 2=filled_by_entity, 3=needed_by_entity?
+        int[,] solidGeom; // 0=blank, 1=geom (square), 2=filled_by_entity, 3=needed_by_entity, 4=ramp_top_left, 5=ramp_top_right, 6=ramp_bottom_left, 7=ramp_bottom_right
 
         int maxDanger, currentDanger;
 
@@ -56,6 +57,7 @@ namespace WickedCrush.GameStates
         bool selectedEntity;
 
         Texture2D crosshair, empty_grid, empty_grid_thick, black_construction_background, sketchy_block,
+            sketchy_ramp_top_left, sketchy_ramp_top_right, sketchy_ramp_bottom_left, sketchy_ramp_bottom_right,
             screen_border, brush1, brush2, brush3, dpad, right_bumper, flip_button, blapck,
             build_mode, select_mode, enemy_mode, trap_mode, things_tool, mode_selection_bubble;
 
@@ -81,8 +83,6 @@ namespace WickedCrush.GameStates
             
 
             entityList = new List<EntityInEditor>();
-            //entityList = new List<EntityInEditor>();
-            //trapList = new List<EntityInEditor>();
 
             entityChoicesList = new List<EntityInEditor>();
             enemyChoicesList = new List<EntityInEditor>();
@@ -99,6 +99,10 @@ namespace WickedCrush.GameStates
             empty_grid_thick = _overlord._cm.Load<Texture2D>(@"editor_graphics/empty_grid_thick");
             black_construction_background = _overlord._cm.Load<Texture2D>(@"editor_graphics/dark_background");
             sketchy_block = _overlord._cm.Load<Texture2D>(@"editor_graphics/sketchy_block");
+            sketchy_ramp_top_left = _overlord._cm.Load<Texture2D>(@"editor_graphics/sketchy_ramp_top_left");
+            sketchy_ramp_top_right = _overlord._cm.Load<Texture2D>(@"editor_graphics/sketchy_ramp_top_right");
+            sketchy_ramp_bottom_left = _overlord._cm.Load<Texture2D>(@"editor_graphics/sketchy_ramp_bottom_left");
+            sketchy_ramp_bottom_right = _overlord._cm.Load<Texture2D>(@"editor_graphics/sketchy_ramp_bottom_right");
             screen_border = _overlord._cm.Load<Texture2D>(@"editor_graphics/white_screen_border");
             brush1 = _overlord._cm.Load<Texture2D>(@"editor_graphics/brush1");
             brush2 = _overlord._cm.Load<Texture2D>(@"editor_graphics/brush2");
@@ -132,6 +136,7 @@ namespace WickedCrush.GameStates
             trapSelectionIndex = 0;
 
             editorMode = 0;
+            usingRamps = false;
             brushSize = 0;
 
             saving = false;
@@ -862,7 +867,18 @@ namespace WickedCrush.GameStates
 
                         if (solidGeom[row, col] == 1 || solidGeom[row, col] == 3)
                             sb.Draw(sketchy_block, new Rectangle((int)(col * 48 * zoomLevel) - (int)cameraPosition.X, 1080 - (int)(48 * zoomLevel) - (int)(row * 48 * zoomLevel) - (int)cameraPosition.Y, (int)(48 * zoomLevel), (int)(48 * zoomLevel)), Color.White);
-                            
+                        
+                        if (solidGeom[row, col] == 4)
+                            sb.Draw(sketchy_ramp_top_left, new Rectangle((int)(col * 48 * zoomLevel) - (int)cameraPosition.X, 1080 - (int)(48 * zoomLevel) - (int)(row * 48 * zoomLevel) - (int)cameraPosition.Y, (int)(48 * zoomLevel), (int)(48 * zoomLevel)), Color.White);
+
+                        if (solidGeom[row, col] == 5)
+                            sb.Draw(sketchy_ramp_top_right, new Rectangle((int)(col * 48 * zoomLevel) - (int)cameraPosition.X, 1080 - (int)(48 * zoomLevel) - (int)(row * 48 * zoomLevel) - (int)cameraPosition.Y, (int)(48 * zoomLevel), (int)(48 * zoomLevel)), Color.White);
+
+                        if (solidGeom[row, col] == 6)
+                            sb.Draw(sketchy_ramp_bottom_left, new Rectangle((int)(col * 48 * zoomLevel) - (int)cameraPosition.X, 1080 - (int)(48 * zoomLevel) - (int)(row * 48 * zoomLevel) - (int)cameraPosition.Y, (int)(48 * zoomLevel), (int)(48 * zoomLevel)), Color.White);
+
+                        if (solidGeom[row, col] == 7)
+                            sb.Draw(sketchy_ramp_bottom_right, new Rectangle((int)(col * 48 * zoomLevel) - (int)cameraPosition.X, 1080 - (int)(48 * zoomLevel) - (int)(row * 48 * zoomLevel) - (int)cameraPosition.Y, (int)(48 * zoomLevel), (int)(48 * zoomLevel)), Color.White);
                     }
                 }
             }
@@ -961,19 +977,45 @@ namespace WickedCrush.GameStates
 
         private void RemoveBlock(Point p)
         {
-            if (p.X >= 0 && p.X < solidGeom.GetLength(1) && p.Y >= 0 && p.Y < solidGeom.GetLength(0) && solidGeom[p.Y, p.X] == 1)
+            if (p.X >= 0 && p.X < solidGeom.GetLength(1) && p.Y >= 0 && p.Y < solidGeom.GetLength(0)
+                && (solidGeom[p.Y, p.X] == 1
+                || isRamp(p)))
+            {
                 solidGeom[p.Y, p.X] = 0;
+                checkForRamps(p);
+            }
+        }
+
+        private void RemoveRamp(Point p)
+        {
+            if (p.X > 0 && p.X < solidGeom.GetLength(1)-1 && p.Y > 0 && p.Y < solidGeom.GetLength(0)-1)
+            {
+                if (isRamp(p) || solidGeom[p.Y, p.X] == 1)
+                {
+                    solidGeom[p.Y, p.X] = 0;
+                    AddRamp(p);
+                    checkForRamps(p);
+                }
+            }
         }
 
         private void UseBrushAdd()
         {
-            AddBlock(selectedGrid);
+            AddRamp(selectedGrid);
+
             if (brushSize >= 1)
             {
                 AddBlock(new Point(selectedGrid.X - 0, selectedGrid.Y + 1));
                 AddBlock(new Point(selectedGrid.X - 0, selectedGrid.Y - 1));
                 AddBlock(new Point(selectedGrid.X + 1, selectedGrid.Y - 0));
                 AddBlock(new Point(selectedGrid.X - 1, selectedGrid.Y - 0));
+                if (brushSize == 1)
+                {
+                    AddRamp(new Point(selectedGrid.X - 1, selectedGrid.Y - 1));
+                    AddRamp(new Point(selectedGrid.X + 1, selectedGrid.Y + 1));
+                    AddRamp(new Point(selectedGrid.X - 1, selectedGrid.Y + 1));
+                    AddRamp(new Point(selectedGrid.X + 1, selectedGrid.Y - 1));
+                }
             }
             if (brushSize >= 2)
             {
@@ -985,6 +1027,17 @@ namespace WickedCrush.GameStates
                 AddBlock(new Point(selectedGrid.X - 0, selectedGrid.Y - 2));
                 AddBlock(new Point(selectedGrid.X + 2, selectedGrid.Y - 0));
                 AddBlock(new Point(selectedGrid.X - 2, selectedGrid.Y - 0));
+                if (brushSize == 2)
+                {
+                    AddRamp(new Point(selectedGrid.X - 2, selectedGrid.Y - 1));
+                    AddRamp(new Point(selectedGrid.X + 2, selectedGrid.Y - 1));
+                    AddRamp(new Point(selectedGrid.X - 1, selectedGrid.Y - 2));
+                    AddRamp(new Point(selectedGrid.X + 1, selectedGrid.Y - 2));
+                    AddRamp(new Point(selectedGrid.X - 2, selectedGrid.Y + 1));
+                    AddRamp(new Point(selectedGrid.X + 2, selectedGrid.Y + 1));
+                    AddRamp(new Point(selectedGrid.X - 1, selectedGrid.Y + 2));
+                    AddRamp(new Point(selectedGrid.X + 1, selectedGrid.Y + 2));
+                }
             }
             if (brushSize >= 3)
             {
@@ -1000,18 +1053,44 @@ namespace WickedCrush.GameStates
                 AddBlock(new Point(selectedGrid.X + 1, selectedGrid.Y - 2));
                 AddBlock(new Point(selectedGrid.X - 1, selectedGrid.Y + 2));
                 AddBlock(new Point(selectedGrid.X - 1, selectedGrid.Y - 2));
+                if (brushSize == 3)
+                {
+                    AddRamp(new Point(selectedGrid.X - 3, selectedGrid.Y - 1));
+                    AddRamp(new Point(selectedGrid.X - 3, selectedGrid.Y + 1));
+                    AddRamp(new Point(selectedGrid.X + 3, selectedGrid.Y - 1));
+                    AddRamp(new Point(selectedGrid.X + 3, selectedGrid.Y + 1));
+                    AddRamp(new Point(selectedGrid.X - 2, selectedGrid.Y - 2));
+                    AddRamp(new Point(selectedGrid.X - 2, selectedGrid.Y + 2));
+                    AddRamp(new Point(selectedGrid.X + 2, selectedGrid.Y - 2));
+                    AddRamp(new Point(selectedGrid.X + 2, selectedGrid.Y + 2));
+                    AddRamp(new Point(selectedGrid.X - 1, selectedGrid.Y - 3));
+                    AddRamp(new Point(selectedGrid.X - 1, selectedGrid.Y + 3));
+                    AddRamp(new Point(selectedGrid.X + 1, selectedGrid.Y - 3));
+                    AddRamp(new Point(selectedGrid.X + 1, selectedGrid.Y + 3));
+                }
             }
         }
 
         private void UseBrushRemove()
         {
-            RemoveBlock(selectedGrid);
+            if (brushSize == 0)
+                RemoveRamp(selectedGrid);
+            else
+                RemoveBlock(selectedGrid);
+
             if (brushSize >= 1)
             {
                 RemoveBlock(new Point(selectedGrid.X - 0, selectedGrid.Y + 1));
                 RemoveBlock(new Point(selectedGrid.X - 0, selectedGrid.Y - 1));
                 RemoveBlock(new Point(selectedGrid.X + 1, selectedGrid.Y - 0));
                 RemoveBlock(new Point(selectedGrid.X - 1, selectedGrid.Y - 0));
+                if (brushSize == 1)
+                {
+                    RemoveRamp(new Point(selectedGrid.X - 1, selectedGrid.Y - 1));
+                    RemoveRamp(new Point(selectedGrid.X + 1, selectedGrid.Y + 1));
+                    RemoveRamp(new Point(selectedGrid.X - 1, selectedGrid.Y + 1));
+                    RemoveRamp(new Point(selectedGrid.X + 1, selectedGrid.Y - 1));
+                }
             }
             if (brushSize >= 2)
             {
@@ -1023,6 +1102,17 @@ namespace WickedCrush.GameStates
                 RemoveBlock(new Point(selectedGrid.X - 0, selectedGrid.Y - 2));
                 RemoveBlock(new Point(selectedGrid.X + 2, selectedGrid.Y - 0));
                 RemoveBlock(new Point(selectedGrid.X - 2, selectedGrid.Y - 0));
+                if (brushSize == 2)
+                {
+                    RemoveRamp(new Point(selectedGrid.X - 1, selectedGrid.Y - 2));
+                    RemoveRamp(new Point(selectedGrid.X - 1, selectedGrid.Y + 2));
+                    RemoveRamp(new Point(selectedGrid.X + 1, selectedGrid.Y - 2));
+                    RemoveRamp(new Point(selectedGrid.X + 1, selectedGrid.Y + 2));
+                    RemoveRamp(new Point(selectedGrid.X - 2, selectedGrid.Y - 1));
+                    RemoveRamp(new Point(selectedGrid.X - 2, selectedGrid.Y + 1));
+                    RemoveRamp(new Point(selectedGrid.X + 2, selectedGrid.Y - 1));
+                    RemoveRamp(new Point(selectedGrid.X + 2, selectedGrid.Y + 1));
+                }
             }
             if (brushSize >= 3)
             {
@@ -1038,13 +1128,113 @@ namespace WickedCrush.GameStates
                 RemoveBlock(new Point(selectedGrid.X + 1, selectedGrid.Y - 2));
                 RemoveBlock(new Point(selectedGrid.X - 1, selectedGrid.Y + 2));
                 RemoveBlock(new Point(selectedGrid.X - 1, selectedGrid.Y - 2));
+                if (brushSize == 3)
+                {
+                    RemoveRamp(new Point(selectedGrid.X - 1, selectedGrid.Y - 3));
+                    RemoveRamp(new Point(selectedGrid.X + 1, selectedGrid.Y - 3));
+                    RemoveRamp(new Point(selectedGrid.X - 1, selectedGrid.Y + 3));
+                    RemoveRamp(new Point(selectedGrid.X + 1, selectedGrid.Y + 3));
+                    RemoveRamp(new Point(selectedGrid.X - 2, selectedGrid.Y - 2));
+                    RemoveRamp(new Point(selectedGrid.X + 2, selectedGrid.Y - 2));
+                    RemoveRamp(new Point(selectedGrid.X - 2, selectedGrid.Y + 2));
+                    RemoveRamp(new Point(selectedGrid.X + 2, selectedGrid.Y + 2));
+                    RemoveRamp(new Point(selectedGrid.X - 3, selectedGrid.Y - 1));
+                    RemoveRamp(new Point(selectedGrid.X + 3, selectedGrid.Y - 1));
+                    RemoveRamp(new Point(selectedGrid.X - 3, selectedGrid.Y + 1));
+                    RemoveRamp(new Point(selectedGrid.X + 3, selectedGrid.Y + 1));
+                }
             }
         }
 
         private void AddBlock(Point p)
         {
-            if (p.X >= 0 && p.X < solidGeom.GetLength(1) && p.Y >= 0 && p.Y < solidGeom.GetLength(0) && solidGeom[p.Y, p.X] == 0)
+            if (p.X >= 0 && p.X < solidGeom.GetLength(1) && p.Y >= 0 && p.Y < solidGeom.GetLength(0)
+                && (solidGeom[p.Y, p.X] == 0 || isRamp(p)))
+            {
                 solidGeom[p.Y, p.X] = 1;
+                checkForRamps(p);
+            }
+        }
+
+        private void AddRamp(Point p) // good lord
+        {
+            if (p.X > 0 && p.X < solidGeom.GetLength(1) - 1 && p.Y > 0 && p.Y < solidGeom.GetLength(0) - 1
+                && (solidGeom[p.Y, p.X] == 0
+                || isRamp(p)))
+            {
+                if (isFilled(new Point(p.X, p.Y + 1)) && isFilled(new Point(p.X - 1, p.Y)))
+                {
+                    if (isFilled(new Point(p.X, p.Y - 1)) || isFilled(new Point(p.X + 1, p.Y)))
+                        AddBlock(p);
+                    else
+                        solidGeom[p.Y, p.X] = 4;
+                }
+                else if (isFilled(new Point(p.X, p.Y + 1)) && isFilled(new Point(p.X + 1, p.Y)))
+                {
+                    if (isFilled(new Point(p.X, p.Y - 1)) || isFilled(new Point(p.X - 1, p.Y)))
+                        AddBlock(p);
+                    else
+                        solidGeom[p.Y, p.X] = 5;
+                }
+                else if (isFilled(new Point(p.X, p.Y - 1)) && isFilled(new Point(p.X - 1, p.Y)))
+                {
+                    if (isFilled(new Point(p.X, p.Y + 1)) || isFilled(new Point(p.X + 1, p.Y)))
+                        AddBlock(p);
+                    else
+                        solidGeom[p.Y, p.X] = 6;
+                }
+                else if (isFilled(new Point(p.X, p.Y - 1)) && isFilled(new Point(p.X + 1, p.Y)))
+                {
+                    if (isFilled(new Point(p.X, p.Y + 1)) || isFilled(new Point(p.X - 1, p.Y)))
+                        AddBlock(p);
+                    else
+                        solidGeom[p.Y, p.X] = 7;
+                }
+                else
+                {
+                    solidGeom[p.Y, p.X] = 0;
+                }
+            }
+        }
+
+        private bool isFilled(Point p)
+        {
+            if (solidGeom[p.Y, p.X] == 1 || solidGeom[p.Y, p.X] == 3)
+                return true;
+            else
+                return false;
+        }
+
+        private bool isRamp(Point p)
+        {
+            if (solidGeom[p.Y, p.X] == 4 || solidGeom[p.Y, p.X] == 5 || solidGeom[p.Y, p.X] == 6 || solidGeom[p.Y, p.X] == 7)
+                return true;
+            else
+                return false;
+        }
+
+        private void checkForRamps(Point p)
+        {
+            Point tempPoint = new Point(p.X + 1, p.Y);
+            if (isRamp(tempPoint))
+            {
+                AddRamp(tempPoint);
+            }
+            tempPoint = new Point(p.X - 1, p.Y);
+            if (isRamp(tempPoint))
+            {
+                AddRamp(tempPoint);
+            }
+            tempPoint = new Point(p.X, p.Y + 1);
+            if (isRamp(tempPoint))
+            {
+                AddRamp(tempPoint);
+            }
+            tempPoint = new Point(p.X, p.Y - 1);
+            if (isRamp(tempPoint))
+            {
+                AddRamp(tempPoint);
+            }
         }
 
         private void SelectedEntity()
@@ -1089,7 +1279,7 @@ namespace WickedCrush.GameStates
             }
         }
 
-        public void SaveLevel(String name)
+        public void SaveLevel(String name) // god i love chains of a million else ifs
         {
             int dir;
 
@@ -1114,6 +1304,31 @@ namespace WickedCrush.GameStates
                             new XAttribute("x", j),
                             new XAttribute("y", i),
                             new XAttribute("mat", "stone")));
+                    else if (solidGeom[i, j] == 4)
+                        grid.Add(new XElement("ramp",
+                            new XAttribute("x", j),
+                            new XAttribute("y", i),
+                            new XAttribute("mat", "stone"),
+                            new XAttribute("corner", "top-left")));
+                    else if (solidGeom[i, j] == 5)
+                        grid.Add(new XElement("ramp",
+                            new XAttribute("x", j),
+                            new XAttribute("y", i),
+                            new XAttribute("mat", "stone"),
+                            new XAttribute("corner", "top-right")));
+                    else if (solidGeom[i, j] == 6)
+                        grid.Add(new XElement("ramp",
+                            new XAttribute("x", j),
+                            new XAttribute("y", i),
+                            new XAttribute("mat", "stone"),
+                            new XAttribute("corner", "bottom-left")));
+                    else if (solidGeom[i, j] == 7)
+                        grid.Add(new XElement("ramp",
+                            new XAttribute("x", j),
+                            new XAttribute("y", i),
+                            new XAttribute("mat", "stone"),
+                            new XAttribute("corner", "bottom-right")));
+
                 }
             }
 

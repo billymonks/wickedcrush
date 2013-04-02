@@ -46,7 +46,7 @@ namespace WickedCrush
         public bool hurtFlash = false;
         public bool blockFlash = false;
 
-        private Vector2 maxVelocity = new Vector2(10f, 9.25f);
+        private Vector2 maxVelocity = new Vector2(10f, 20f);
 
         //vertex information
         protected Vector3 normal, tangent, binormal;

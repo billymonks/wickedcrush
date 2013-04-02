@@ -264,6 +264,7 @@ namespace WickedCrush.GameEntities
                 && !sm.previousControlState.name.Contains("melee")
                 && !sm.previousControlState.name.Equals("aerial_attack")
                 && !sm.previousControlState.name.Equals("hurt")
+                && !sm.previousControlState.name.Contains("walljump")
                 && !_controls.ActionPressed()
                 && this.hp > 0,
                 c =>
@@ -293,6 +294,7 @@ namespace WickedCrush.GameEntities
                 && !sm.previousControlState.name.Equals("block_hit_deflect")
                 && !sm.previousControlState.name.Equals("aerial_attack")
                 && !sm.previousControlState.name.Equals("hurt")
+                && !sm.previousControlState.name.Contains("walljump")
                 && !_controls.ActionPressed()
                 && velocity.Y > 0f
                 && this.hp > 0,
@@ -320,6 +322,145 @@ namespace WickedCrush.GameEntities
 
                     if (hp <= 0)
                         Die();
+                }));
+            stateList.Add("left-walljump", new State("left-walljump",
+                c => ((sm.previousControlState.name.Equals("left-wall-cling")
+                && _controls.JumpPressed())
+                || sm.previousControlState.name.Equals("left-walljump"))
+                && !_controls.ActionPressed(),
+                c =>
+                {
+                    if (currentAnimation != null && !currentAnimation.Equals(animationList["jump"]))
+                    {
+                        currentAnimation.ResetAnimation();
+                        SetSmallFrame();
+                    }
+                    currentAnimation = animationList["jump"];
+                    this.accel.Y = 0f;
+
+                    if (!sm.previousControlState.name.Equals("left-walljump"))
+                    {
+                        this.velocity.Y = jump_amount;
+                        setWallJumpTimer(250);
+
+                        
+                    }
+
+                    sm.currentControlState = sm.control["left-walljump"];
+                    sm.previousControlState = sm.control["left-walljump"];
+
+                    this.facingDir = Direction.Right;
+
+                    this.accel.X = 0f;
+                    this.velocity.X = 3f;
+
+                    ApplyGravity();
+                    blocking = false;
+
+                    if (hp <= 0)
+                        Die();
+                }));
+            stateList.Add("right-walljump", new State("right-walljump",
+                c => ((sm.previousControlState.name.Equals("right-wall-cling")
+                && _controls.JumpPressed())
+                || sm.previousControlState.name.Equals("right-walljump"))
+                && !_controls.ActionPressed(),
+                c =>
+                {
+                    if (currentAnimation != null && !currentAnimation.Equals(animationList["jump"]))
+                    {
+                        currentAnimation.ResetAnimation();
+                        SetSmallFrame();
+                    }
+                    currentAnimation = animationList["jump"];
+
+                    this.accel.Y = 0f;
+
+                    if (!sm.previousControlState.name.Equals("right-walljump"))
+                    {
+                        this.velocity.Y = jump_amount;
+                        setWallJumpTimer(250);
+
+                        
+                    }
+
+                    sm.currentControlState = sm.control["right-walljump"];
+                    sm.previousControlState = sm.control["right-walljump"];
+
+                    this.facingDir = Direction.Left;
+
+                    this.accel.X = 0f;
+                    this.velocity.X = -3f;
+
+                    ApplyGravity();
+                    blocking = false;
+
+                    if (hp <= 0)
+                        Die();
+                }));
+            stateList.Add("left-wall-cling", new State("left-wall-cling",
+                c => underFeetCollisionList.Count == 0
+                && ((Character)c).leftWallHit
+                && _controls.XAxis()<0f
+                && !sm.previousControlState.name.Equals("ru_melee_1")
+                && !sm.previousControlState.name.Equals("st_melee_1")
+                && !sm.previousControlState.name.Equals("melee_2")
+                && !sm.previousControlState.name.Equals("melee_3")
+                && !sm.previousControlState.name.Equals("block_hit_deflect")
+                && !sm.previousControlState.name.Equals("aerial_attack")
+                && !sm.previousControlState.name.Equals("hurt")
+                && !_controls.ActionPressed(),
+                c =>
+                {
+                    this.accel.Y = 0f;
+                    if (this.velocity.Y < -3f)
+                    {
+                        this.velocity.Y = -3f;
+                    }
+                    else
+                    {
+                        ApplyGravity();
+                    }
+
+                    blocking = false;
+
+                    this.facingDir = Direction.Right;
+
+                    if (hp <= 0)
+                        Die();
+
+                }));
+            stateList.Add("right-wall-cling", new State("right-wall-cling",
+                c => underFeetCollisionList.Count == 0
+                && ((Character)c).rightWallHit
+                && _controls.XAxis() > 0f
+                && !sm.previousControlState.name.Equals("ru_melee_1")
+                && !sm.previousControlState.name.Equals("st_melee_1")
+                && !sm.previousControlState.name.Equals("melee_2")
+                && !sm.previousControlState.name.Equals("melee_3")
+                && !sm.previousControlState.name.Equals("block_hit_deflect")
+                && !sm.previousControlState.name.Equals("aerial_attack")
+                && !sm.previousControlState.name.Equals("hurt")
+                && !_controls.ActionPressed(),
+                c =>
+                {
+                    this.accel.Y = 0f;
+                    if (this.velocity.Y < -3f)
+                    {
+                        this.velocity.Y = -3f;
+                    }
+                    else
+                    {
+                        ApplyGravity();
+                    }
+
+                    blocking = false;
+
+                    this.facingDir = Direction.Left;
+
+                    if (hp <= 0)
+                        Die();
+
                 }));
             stateList.Add("fall", new State("fall",
                 c => underFeetCollisionList.Count == 0
@@ -1204,6 +1345,19 @@ namespace WickedCrush.GameEntities
             return;
         }
 
+        private void setWallJumpTimer(double interval)
+        {
+            if (timer != null)
+                timer.Enabled = false;
+
+            timer = new Timer();
+            timer.Elapsed += new ElapsedEventHandler(wallJumpTimerUp);
+
+            timer.Interval = interval;
+            timer.Enabled = true;
+            return;
+        }
+
         private void blockTimerUp(object source, ElapsedEventArgs e)
         {
             timer.Enabled = false;
@@ -1221,6 +1375,12 @@ namespace WickedCrush.GameEntities
         {
             timer.Enabled = false;
             sm.previousControlState = sm.control["idle"];
+        }
+
+        private void wallJumpTimerUp(object source, ElapsedEventArgs e)
+        {
+            timer.Enabled = false;
+            sm.previousControlState = sm.control["jump"];
         }
 
         private void SetSmallFrame()

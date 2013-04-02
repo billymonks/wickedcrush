@@ -1102,6 +1102,26 @@
       <Importer>WavImporter</Importer>
       <Processor>SoundEffectProcessor</Processor>
     </Compile>
+    <Compile Include="editor_graphics\sketchy_ramp_bottom_left.png">
+      <Name>sketchy_ramp_bottom_left</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="editor_graphics\sketchy_ramp_bottom_right.png">
+      <Name>sketchy_ramp_bottom_right</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="editor_graphics\sketchy_ramp_top_left.png">
+      <Name>sketchy_ramp_top_left</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+    <Compile Include="editor_graphics\sketchy_ramp_top_right.png">
+      <Name>sketchy_ramp_top_right</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
     <Content Include="levels\ULTIMATECHALLENGEEE.xml">
       <Name>ULTIMATECHALLENGEEE</Name>
       <Importer>XmlImporter</Importer>
