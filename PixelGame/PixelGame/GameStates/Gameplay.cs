@@ -147,10 +147,10 @@ namespace WickedCrush.GameStates
             normalMappingEffect = _overlord._cm.Load<Effect>(@"effects/NormalMappingMultiLights");
 
             viewMatrix = Matrix.CreateLookAt(new Vector3(256f, 256f, 1125.0f), new Vector3(256f, 256f, 0f), Vector3.Up);
-            //projectionMatrix = Matrix.CreatePerspectiveFieldOfView(MathHelper.PiOver4, (float)_overlord._gd.Viewport.Width / (float)_overlord._gd.Viewport.Height, 0.2f, 1536f);
-            //_overlord.isOrtho = false;
-            projectionMatrix = Matrix.CreateOrthographic(1067f, 600f, 0.2f, 1536f);
-            _overlord.isOrtho = true;
+            projectionMatrix = Matrix.CreatePerspectiveFieldOfView(MathHelper.PiOver4, (float)_overlord._gd.Viewport.Width / (float)_overlord._gd.Viewport.Height, 0.2f, 1536f);
+            _overlord.isOrtho = false;
+            //projectionMatrix = Matrix.CreateOrthographic(1280f, 720f, 0.2f, 1536f);
+            //_overlord.isOrtho = true;
             //lightDir = new Vector3(0.1f, -0.6f, -0.6f);
 
             preAlphaFont = _overlord._cm.Load<SpriteFont>(@"fonts/PreAlphaFont");

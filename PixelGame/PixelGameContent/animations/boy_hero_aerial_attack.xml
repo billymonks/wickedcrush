@@ -1,4 +1,4 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <animation name="boy_hero_aerial_attack">
-  <attributes frameSize.X="763" frameSize.Y="385" sheetSize.X="3" sheetSize.Y="3" totalFrames="9" frameInterval="30" />
+  <attributes frameSize.X="763" frameSize.Y="385" sheetSize.X="3" sheetSize.Y="3" totalFrames="9" frameInterval="15" />
 </animation>

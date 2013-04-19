@@ -177,6 +177,7 @@ namespace WickedCrush.GameEntities
                 && !sm.previousControlState.name.Equals("block_hit_deflect")
                 && !sm.previousControlState.name.Contains("melee")
                 && !sm.previousControlState.name.Equals("aerial_attack")
+                && !sm.previousControlState.name.Equals("wall_attack")
                 && !sm.previousControlState.name.Equals("hurt")
                 && _controls.XAxis() == 0f
                 && !_controls.JumpPressed()
@@ -218,6 +219,7 @@ namespace WickedCrush.GameEntities
                     && !sm.previousControlState.name.Equals("block_hit_deflect")
                     && !sm.previousControlState.name.Contains("melee")
                     && !sm.previousControlState.name.Equals("aerial_attack")
+                    && !sm.previousControlState.name.Equals("wall_attack")
                     && !sm.previousControlState.name.Equals("hurt")
                     && Math.Abs(_controls.XAxis()) > 0f
                     && !_controls.JumpPressed()
@@ -263,6 +265,7 @@ namespace WickedCrush.GameEntities
                 && !sm.previousControlState.name.Equals("block_hit_deflect")
                 && !sm.previousControlState.name.Contains("melee")
                 && !sm.previousControlState.name.Equals("aerial_attack")
+                && !sm.previousControlState.name.Equals("wall_attack")
                 && !sm.previousControlState.name.Equals("hurt")
                 && !sm.previousControlState.name.Contains("walljump")
                 && !_controls.ActionPressed()
@@ -275,6 +278,11 @@ namespace WickedCrush.GameEntities
                         SetSmallFrame();
                     } 
                     currentAnimation = animationList["jump"];
+
+                    if (_controls.XAxis() > 0f)
+                        this.facingDir = Direction.Right;
+                    else if (_controls.XAxis() < 0f)
+                        this.facingDir = Direction.Left;
 
                     if (!sm.previousControlState.name.Contains("jump"))
                         this.velocity.Y = jump_amount;
@@ -293,6 +301,7 @@ namespace WickedCrush.GameEntities
                 c => underFeetCollisionList.Count == 0
                 && !sm.previousControlState.name.Equals("block_hit_deflect")
                 && !sm.previousControlState.name.Equals("aerial_attack")
+                && !sm.previousControlState.name.Equals("wall_attack")
                 && !sm.previousControlState.name.Equals("hurt")
                 && !sm.previousControlState.name.Contains("walljump")
                 && !_controls.ActionPressed()
@@ -306,6 +315,11 @@ namespace WickedCrush.GameEntities
                         SetSmallFrame();
                     } 
                     currentAnimation = animationList["jump"];
+
+                    if (_controls.XAxis() > 0f)
+                        this.facingDir = Direction.Right;
+                    else if (_controls.XAxis() < 0f)
+                        this.facingDir = Direction.Left;
 
                     if (!sm.previousControlState.name.Contains("jump"))
                         this.velocity.Y = 7f;
@@ -323,10 +337,10 @@ namespace WickedCrush.GameEntities
                     if (hp <= 0)
                         Die();
                 }));
-            stateList.Add("left-walljump", new State("left-walljump",
-                c => ((sm.previousControlState.name.Equals("left-wall-cling")
+            stateList.Add("walljump", new State("walljump",
+                c => ((sm.previousControlState.name.Equals("wall-cling")
                 && _controls.JumpPressed())
-                || sm.previousControlState.name.Equals("left-walljump"))
+                || sm.previousControlState.name.Equals("walljump"))
                 && !_controls.ActionPressed(),
                 c =>
                 {
@@ -338,21 +352,24 @@ namespace WickedCrush.GameEntities
                     currentAnimation = animationList["jump"];
                     this.accel.Y = 0f;
 
-                    if (!sm.previousControlState.name.Equals("left-walljump"))
+                    if (!sm.previousControlState.name.Equals("walljump"))
                     {
                         this.velocity.Y = jump_amount;
-                        setWallJumpTimer(250);
+                        setWallJumpTimer(150);
 
                         
                     }
 
-                    sm.currentControlState = sm.control["left-walljump"];
-                    sm.previousControlState = sm.control["left-walljump"];
+                    sm.currentControlState = sm.control["walljump"];
+                    sm.previousControlState = sm.control["walljump"];
 
-                    this.facingDir = Direction.Right;
+                    //this.facingDir = Direction.Right;
 
                     this.accel.X = 0f;
-                    this.velocity.X = 3f;
+                    if (this.facingDir.Equals(Direction.Right))
+                        this.velocity.X = 5f;
+                    else
+                        this.velocity.X = -5f;
 
                     ApplyGravity();
                     blocking = false;
@@ -360,58 +377,30 @@ namespace WickedCrush.GameEntities
                     if (hp <= 0)
                         Die();
                 }));
-            stateList.Add("right-walljump", new State("right-walljump",
-                c => ((sm.previousControlState.name.Equals("right-wall-cling")
-                && _controls.JumpPressed())
-                || sm.previousControlState.name.Equals("right-walljump"))
-                && !_controls.ActionPressed(),
-                c =>
-                {
-                    if (currentAnimation != null && !currentAnimation.Equals(animationList["jump"]))
-                    {
-                        currentAnimation.ResetAnimation();
-                        SetSmallFrame();
-                    }
-                    currentAnimation = animationList["jump"];
-
-                    this.accel.Y = 0f;
-
-                    if (!sm.previousControlState.name.Equals("right-walljump"))
-                    {
-                        this.velocity.Y = jump_amount;
-                        setWallJumpTimer(250);
-
-                        
-                    }
-
-                    sm.currentControlState = sm.control["right-walljump"];
-                    sm.previousControlState = sm.control["right-walljump"];
-
-                    this.facingDir = Direction.Left;
-
-                    this.accel.X = 0f;
-                    this.velocity.X = -3f;
-
-                    ApplyGravity();
-                    blocking = false;
-
-                    if (hp <= 0)
-                        Die();
-                }));
-            stateList.Add("left-wall-cling", new State("left-wall-cling",
+            
+            stateList.Add("wall-cling", new State("wall-cling",
                 c => underFeetCollisionList.Count == 0
-                && ((Character)c).leftWallHit
-                && _controls.XAxis()<0f
+                && ((((Character)c).leftWallHit
+                && _controls.XAxis()<0f) || ((((Character)c).rightWallHit
+                && _controls.XAxis()>0f)))
                 && !sm.previousControlState.name.Equals("ru_melee_1")
                 && !sm.previousControlState.name.Equals("st_melee_1")
                 && !sm.previousControlState.name.Equals("melee_2")
                 && !sm.previousControlState.name.Equals("melee_3")
                 && !sm.previousControlState.name.Equals("block_hit_deflect")
                 && !sm.previousControlState.name.Equals("aerial_attack")
+                && !sm.previousControlState.name.Equals("wall_attack")
                 && !sm.previousControlState.name.Equals("hurt")
                 && !_controls.ActionPressed(),
                 c =>
                 {
+                    if (currentAnimation != null && !currentAnimation.Equals(animationList["fall"]))
+                    {
+                        currentAnimation.ResetAnimation();
+                        SetSmallFrame();
+                    }
+                    currentAnimation = animationList["fall"];
+
                     this.accel.Y = 0f;
                     if (this.velocity.Y < -3f)
                     {
@@ -424,44 +413,17 @@ namespace WickedCrush.GameEntities
 
                     blocking = false;
 
-                    this.facingDir = Direction.Right;
+                    if (_controls.XAxis() < 0f)
+                        this.facingDir = Direction.Right;
+                    else if (_controls.XAxis() > 0f)
+                        this.facingDir = Direction.Left;
+
 
                     if (hp <= 0)
                         Die();
 
                 }));
-            stateList.Add("right-wall-cling", new State("right-wall-cling",
-                c => underFeetCollisionList.Count == 0
-                && ((Character)c).rightWallHit
-                && _controls.XAxis() > 0f
-                && !sm.previousControlState.name.Equals("ru_melee_1")
-                && !sm.previousControlState.name.Equals("st_melee_1")
-                && !sm.previousControlState.name.Equals("melee_2")
-                && !sm.previousControlState.name.Equals("melee_3")
-                && !sm.previousControlState.name.Equals("block_hit_deflect")
-                && !sm.previousControlState.name.Equals("aerial_attack")
-                && !sm.previousControlState.name.Equals("hurt")
-                && !_controls.ActionPressed(),
-                c =>
-                {
-                    this.accel.Y = 0f;
-                    if (this.velocity.Y < -3f)
-                    {
-                        this.velocity.Y = -3f;
-                    }
-                    else
-                    {
-                        ApplyGravity();
-                    }
-
-                    blocking = false;
-
-                    this.facingDir = Direction.Left;
-
-                    if (hp <= 0)
-                        Die();
-
-                }));
+            
             stateList.Add("fall", new State("fall",
                 c => underFeetCollisionList.Count == 0
                 && !sm.previousControlState.name.Equals("ru_melee_1")
@@ -470,6 +432,7 @@ namespace WickedCrush.GameEntities
                 && !sm.previousControlState.name.Equals("melee_3")
                 && !sm.previousControlState.name.Equals("block_hit_deflect")
                 && !sm.previousControlState.name.Equals("aerial_attack")
+                && !sm.previousControlState.name.Equals("wall_attack")
                 && !sm.previousControlState.name.Equals("hurt")
                 && !_controls.ActionPressed(),
                 c =>
@@ -481,7 +444,10 @@ namespace WickedCrush.GameEntities
                     } 
                     currentAnimation = animationList["fall"];
 
-                    
+                    if (_controls.XAxis() > 0f)
+                        this.facingDir = Direction.Right;
+                    else if (_controls.XAxis() < 0f)
+                        this.facingDir = Direction.Left;
 
                     this.velocity.X = _controls.XAxis() * runspeed;
 
@@ -492,6 +458,84 @@ namespace WickedCrush.GameEntities
 
                     if (hp <= 0)
                         Die();
+                }));
+
+            stateList.Add("wall_attack", new State("wall_attack",
+                c => ((sm.previousControlState.name.Equals("wall-cling")
+                    && _controls.ActionPressed())
+                    || sm.previousControlState.name.Equals("wall_attack")
+                    && underFeetCollisionList.Count == 0),
+                c => 
+                {
+                    if (currentAnimation != null && !currentAnimation.Equals(animationList["aerial_attack"]))
+                    {
+                        currentAnimation.ResetAnimation();
+                        SetAerialAttackFrame();
+                        attackDeployable = true;
+                    }
+                    currentAnimation = animationList["aerial_attack"];
+
+                    this.accel.Y = 0f;
+                    if (this.velocity.Y < -3f)
+                    {
+                        this.velocity.Y = -3f;
+                    }
+                    else
+                    {
+                        ApplyGravity();
+                    }
+
+                    blocking = false;
+
+
+                    if (attackDeployable && currentAnimation.getCurrentFrameNumber() >= 1)
+                    {
+                        attackDeployable = false;
+
+                        if (facingDir.Equals(Direction.Right)) // attack deployment
+                        {
+                            _cf.AddCharacterToList(new Attack(_cf._cm, _cf._gd,
+                                new Vector2(this.pos.X + 32, this.pos.Y - 100),
+                                new Vector2(128f, 192f),
+                                1,
+                                1f,
+                                true,
+                                this.facingDir,
+                                this));
+
+                        }
+                        else
+                        {
+                            _cf.AddCharacterToList(new Attack(_cf._cm, _cf._gd,
+                                new Vector2(this.pos.X - 96, this.pos.Y - 100), //no, i don't know why it's different, i mean i have an idea why but i don't really give a shittt
+                                new Vector2(128f, 192f),
+                                1,
+                                1f,
+                                true,
+                                this.facingDir,
+                                this));
+                        } // end of attack deployment
+
+                        //_sound.getSoundInstance("swordSound2").Play();
+
+                        swordSound2 = _sound.getSoundInstance("swordSound2");
+                        swordSound2.Apply3D(_sound.listener, emitter);
+                        swordSound2.Play();
+
+                    }
+
+                    if (currentAnimation.complete)
+                    {
+                        sm.previousControlState = sm.control["idle"];
+                        sm.currentControlState = sm.control["idle"];
+                    }
+
+
+                    if (hp <= 0)
+                        Die();
+
+
+
                 }));
 
             stateList.Add("aerial_attack", new State("aerial_attack",
@@ -922,9 +966,11 @@ namespace WickedCrush.GameEntities
                         currentAnimation.ResetAnimation();
                         SetHugeFrame();
 
-                        setPostAttackHandler(100);
+                        setPostAttackHandler(80);
                     }
                     currentAnimation = animationList["melee_1_post"];
+
+                    attackBuffered = false;
 
                     this.velocity.X = 0f;
 
@@ -999,6 +1045,9 @@ namespace WickedCrush.GameEntities
                         //_sound.getSoundInstance("swordSound2").Play();
                     }
 
+                    if (currentAnimation.getCurrentFrameNumber() >= 1 && _controls.ActionPressed())
+                        attackBuffered = true;
+
                     this.velocity.X = 0f;
 
                     this.accel.X = 0f;
@@ -1023,7 +1072,7 @@ namespace WickedCrush.GameEntities
                 }));
             stateList.Add("melee_2_post", new State("melee_2_post", // attack during post triggers melee_3
                 c => (sm.previousControlState.name.Equals("melee_2_post")
-                    && !_controls.ActionPressed()),
+                    && (!_controls.ActionPressed() && !attackBuffered)),
                 c =>
                 {
                     if (currentAnimation != null && !currentAnimation.Equals(animationList["melee_2_post"]))
@@ -1031,11 +1080,11 @@ namespace WickedCrush.GameEntities
                         currentAnimation.ResetAnimation();
                         SetHugeFrame();
 
-                        setPostAttackHandler(200);
+                        setPostAttackHandler(115);
                     }
                     currentAnimation = animationList["melee_2_post"];
 
-
+                    attackBuffered = false;
 
                     this.velocity.X = 0f;
 
@@ -1061,7 +1110,7 @@ namespace WickedCrush.GameEntities
                 }));
             stateList.Add("melee_3", new State("melee_3",
                 c => ((sm.previousControlState.name.Equals("melee_2_post")
-                    && _controls.ActionPressed())
+                    && (_controls.ActionPressed() || attackBuffered))
                     || sm.previousControlState.name.Equals("melee_3")),
                 c =>
                 {
@@ -1253,7 +1302,7 @@ namespace WickedCrush.GameEntities
         {
             base.AttackCallback();
 
-            this.velocity.Y = jump_amount;
+            //this.velocity.Y = 0;
         }
 
         private void Die() //can't be removing the hero, need death animation

@@ -1235,21 +1235,6 @@
       <Importer>Mp3Importer</Importer>
       <Processor>SoundEffectProcessor</Processor>
     </Compile>
-    <Compile Include="sounds\Arm Whoosh 02.mp3">
-      <Name>Arm Whoosh 02</Name>
-      <Importer>Mp3Importer</Importer>
-      <Processor>SoundEffectProcessor</Processor>
-    </Compile>
-    <Compile Include="sounds\Arm Whoosh 03.mp3">
-      <Name>Arm Whoosh 03</Name>
-      <Importer>Mp3Importer</Importer>
-      <Processor>SoundEffectProcessor</Processor>
-    </Compile>
-    <Compile Include="sounds\Arm Whoosh 10.mp3">
-      <Name>Arm Whoosh 10</Name>
-      <Importer>Mp3Importer</Importer>
-      <Processor>SoundEffectProcessor</Processor>
-    </Compile>
     <Compile Include="sounds\fireshot.wav">
       <Name>fireshot</Name>
       <Importer>WavImporter</Importer>
@@ -1312,6 +1297,21 @@
     </Compile>
     <Compile Include="sounds\metal5.wav">
       <Name>metal5</Name>
+      <Importer>WavImporter</Importer>
+      <Processor>SoundEffectProcessor</Processor>
+    </Compile>
+    <Compile Include="sounds\Arm Whoosh 02.wav">
+      <Name>Arm Whoosh 02</Name>
+      <Importer>WavImporter</Importer>
+      <Processor>SoundEffectProcessor</Processor>
+    </Compile>
+    <Compile Include="sounds\Arm Whoosh 03.wav">
+      <Name>Arm Whoosh 03</Name>
+      <Importer>WavImporter</Importer>
+      <Processor>SoundEffectProcessor</Processor>
+    </Compile>
+    <Compile Include="sounds\Arm Whoosh 10.wav">
+      <Name>Arm Whoosh 10</Name>
       <Importer>WavImporter</Importer>
       <Processor>SoundEffectProcessor</Processor>
     </Compile>

@@ -183,9 +183,6 @@ Content\sounds\metal5.xnb
 Content\sounds\20 Sword or Bayonet Juicy Stab 4 With Short Gush Impact.xnb
 Content\sounds\22 Sword or Bayonet Juicy Stab 6 With Short Gush Impact.xnb
 Content\sounds\23 Sword or Bayonet Juicy Stab 7 Short Gush Impact With Me.xnb
-Content\sounds\Arm Whoosh 02.xnb
-Content\sounds\Arm Whoosh 03.xnb
-Content\sounds\Arm Whoosh 10.xnb
 Content\effects\NormalMapping.xnb
 Content\effects\NormalMappingMultiLights.xnb
 Content\fonts\PreAlphaFont.xnb
@@ -195,6 +192,9 @@ Content\editor_graphics\sketchy_ramp_bottom_left.xnb
 Content\editor_graphics\sketchy_ramp_bottom_right.xnb
 Content\editor_graphics\sketchy_ramp_top_left.xnb
 Content\editor_graphics\sketchy_ramp_top_right.xnb
+Content\sounds\Arm Whoosh 02.xnb
+Content\sounds\Arm Whoosh 03.xnb
+Content\sounds\Arm Whoosh 10.xnb
 Content\animations\arrow.xml
 Content\animations\assplosion.xml
 Content\animations\bird-right.xml
