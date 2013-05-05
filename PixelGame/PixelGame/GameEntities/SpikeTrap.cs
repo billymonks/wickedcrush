@@ -6,26 +6,35 @@ using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using WickedCrush.GameStates;
+using Microsoft.Xna.Framework.Audio;
+using WickedCrush.Utility;
 
 namespace WickedCrush.GameEntities
 {
     public class SpikeTrap : Character
     {
+        SoundManager _sound;
 
-        public SpikeTrap(ContentManager cm, GraphicsDevice gd, Vector2 pos)
+        private SoundEffectInstance bladeStab3;
+
+        private AudioEmitter emitter;
+
+        public SpikeTrap(ContentManager cm, GraphicsDevice gd, Vector2 pos, SoundManager sound)
             : base(pos, new Vector2(64f, 64f), new Vector2(0.5f, 0.5f), new Vector2(-16f, 0f), 128f, gd)
         {
+            _sound = sound;
             CreateCharacter(cm);
-            walkThrough = false;
         }
         public void CreateCharacter(ContentManager cm)
         {
             name = "Spike_Trap";
             CreateAnimationList(cm);
             CreateStateMachine();
+            SetupSounds();
 
             invuln = true;
             immobile = true;
+            walkThrough = true;
         }
         public void CreateAnimationList(ContentManager cm)
         {
@@ -58,6 +67,13 @@ namespace WickedCrush.GameEntities
                 }));
 
             sm = new StateMachine(stateList);
+        }
+
+        private void SetupSounds()
+        {
+            emitter = new AudioEmitter();
+
+            _sound.addSound("bladeStab3", "bladeStab3");
         }
 
         protected override void SetupVerts()
@@ -330,9 +346,23 @@ namespace WickedCrush.GameEntities
             {
                 if (!collisionList[i].invuln)
                 {
+                    if (collisionList[i].type.Equals(EntType.Character) && ((Character)collisionList[i]).readyForRemoval)
+                    {
+                        continue;
+                    }
                     collisionList[i].hp = 0;
+                    bladeStab3 = _sound.getSoundInstance("bladeStab3");
+                    bladeStab3.Apply3D(_sound.listener, emitter);
+                    bladeStab3.Play();
                 }
             }
+        }
+
+        protected override void UpdateSoundPosition()
+        {
+            base.UpdateSoundPosition();
+
+            emitter.Position = centerPoint;
         }
     }
 }

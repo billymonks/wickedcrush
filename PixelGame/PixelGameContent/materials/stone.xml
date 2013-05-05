@@ -1,21 +1,22 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <material name="stone">
+  <texture index="0" key="1">0</texture>
   <texture index="0" key="0">solid_purple</texture>
-  <texture index="1" key="0">solid_purple</texture>
-  <texture index="2" key="0">solid_purple</texture>
-  <texture index="3" key="0">solid_purple</texture>
-  <texture index="4" key="0">solid_purple</texture>
-  <texture index="5" key="0">solid_purple</texture>
-  <texture index="6" key="0">solid_purple</texture>
-  <texture index="7" key="0">cavewall5</texture>
-  <texture index="8" key="0">cavewall5</texture>
-  <texture index="9" key="0">cavewall5</texture>
-  <texture index="10" key="0">cavewall5</texture>
-  <texture index="11" key="0">cavewall5</texture>
-  <texture index="12" key="0">cavewall5</texture>
-  <texture index="13" key="0">cavewall5</texture>
-  <texture index="14" key="0">cavewall5</texture>
-  <texture index="15" key="0">cavewall5</texture>
+  <texture index="1" key="0">1</texture>
+  <texture index="2" key="0">2</texture>
+  <texture index="3" key="0">3</texture>
+  <texture index="4" key="0">4</texture>
+  <texture index="5" key="0">5</texture>
+  <texture index="6" key="0">6</texture>
+  <texture index="7" key="0">7</texture>
+  <texture index="8" key="0">8</texture>
+  <texture index="9" key="0">9</texture>
+  <texture index="10" key="0">10</texture>
+  <texture index="11" key="0">11</texture>
+  <texture index="12" key="0">12</texture>
+  <texture index="13" key="0">13</texture>
+  <texture index="14" key="0">14</texture>
+  <texture index="15" key="0">15</texture>
   <texture index="16" key="0">solid_purple</texture>
   <texture index="17" key="0">cavewall5</texture>
   <texture index="18" key="0">cavewall5</texture>

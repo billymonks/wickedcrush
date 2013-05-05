@@ -22,7 +22,7 @@ namespace WickedCrush.GameEntities
 
         public Fireball(ContentManager cm, GraphicsDevice gd, Vector2 pos, int dmgAmount, float force,
             Direction atkDir, Character creator, CharacterFactory cf)
-            : base(pos, new Vector2(64f, 16f), new Vector2(0.2f, 0.5f), new Vector2(-25.6f, 4f), 128.5f, gd)
+            : base(pos, new Vector2(64f, 16f), new Vector2(0.2f, 0.5f), new Vector2(-25.6f, -4f), 128.5f, gd)
         {
             this.dmgAmount = dmgAmount;
             this.force = force;
@@ -30,6 +30,8 @@ namespace WickedCrush.GameEntities
             this.creator = creator;
 
             this._cf = cf;
+
+            this.bright = true;
 
             facingDir = atkDir;
             CreateCharacter(cm);

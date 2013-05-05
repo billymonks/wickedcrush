@@ -7,6 +7,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Content;
 using WickedCrush.Utility;
+using Microsoft.Xna.Framework.Audio;
 
 namespace WickedCrush.GameEntities
 {
@@ -15,16 +16,23 @@ namespace WickedCrush.GameEntities
         private CharacterFactory _cf;
         private Hero _hero;
         private Timer timer;
+        SoundManager _sound;
+
+        private SoundEffectInstance bladeStab1;
+        private SoundEffectInstance bladeStab2;
+
+        private AudioEmitter emitter;
 
         private Random random;
 
         private float walkSpeed = 4f;
 
-        public Rhino(ContentManager cm, GraphicsDevice gd, Vector2 pos, CharacterFactory cf, Hero hero, Direction d)
+        public Rhino(ContentManager cm, GraphicsDevice gd, Vector2 pos, CharacterFactory cf, Hero hero, Direction d, SoundManager sound)
             : base(pos, new Vector2(256f, 256f), new Vector2(0.45f, 0.514f), new Vector2(-70.4f, -43f), 128f, gd)
         {
             _cf = cf;
             _hero = hero;
+            _sound = sound;
 
             facingDir = d;
 
@@ -39,8 +47,30 @@ namespace WickedCrush.GameEntities
             name = "Rhino";
             CreateAnimationList(cm);
             CreateStateMachine();
+            SetupSounds();
+
+            walkThrough = true;
 
             //facingDir = Direction.Left;
+        }
+
+        private void SetupSounds()
+        {
+            emitter = new AudioEmitter();
+
+            _sound.addSound("bladeStab1", "bladeStab1");
+            _sound.addSound("bladeStab2", "bladeStab2");
+        }
+
+        protected override void UpdateSoundPosition()
+        {
+            base.UpdateSoundPosition();
+            if (emitter != null)
+                emitter.Position = centerPoint;
+        }
+
+        public override void StopSoundInstances()
+        {
         }
 
         private void CreateAnimationList(ContentManager cm)
@@ -383,6 +413,8 @@ namespace WickedCrush.GameEntities
 
             _cf._damageNumbersList.Add(new DamageNumber((int)((dmgAmount * 50) + (random.NextDouble() - 0.5) * 4), pos + offset));
 
+            PlayDamagedSoundEffect();
+
             if (atkDir == Direction.Left)
                 this.facingDir = Direction.Right;
             else
@@ -469,6 +501,22 @@ namespace WickedCrush.GameEntities
                 facingDir = Direction.Right;
 
             StartTurnTimer();
+        }
+
+        private void PlayDamagedSoundEffect()
+        {
+            if (random.NextDouble() > 0.5)
+            {
+                bladeStab1 = _sound.getSoundInstance("bladeStab1");
+                bladeStab1.Apply3D(_sound.listener, emitter);
+                bladeStab1.Play();
+            }
+            else
+            {
+                bladeStab2 = _sound.getSoundInstance("bladeStab2");
+                bladeStab2.Apply3D(_sound.listener, emitter);
+                bladeStab2.Play();
+            }
         }
     }
 }

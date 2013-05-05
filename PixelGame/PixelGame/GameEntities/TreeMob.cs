@@ -18,6 +18,9 @@ namespace WickedCrush.GameEntities
         private Timer atimer, ttimer, dtimer;
         SoundManager _sound;
 
+        private SoundEffectInstance bladeStab1;
+        private SoundEffectInstance bladeStab2;
+
         private AudioEmitter emitter;
 
         private Random random;
@@ -41,11 +44,13 @@ namespace WickedCrush.GameEntities
 
         public void CreateCharacter(ContentManager cm)
         {
-            hp = 4;
+            hp = 1;
             name = "TreeMob";
             CreateAnimationList(cm);
             CreateStateMachine();
             SetupSounds();
+
+            walkThrough = true;
 
             //facingDir = Direction.Left;
 
@@ -57,6 +62,8 @@ namespace WickedCrush.GameEntities
             emitter = new AudioEmitter();
             
             _sound.addSound("flameout", "fireshot");
+            _sound.addSound("bladeStab1", "bladeStab1");
+            _sound.addSound("bladeStab2", "bladeStab2");
         }
 
         protected override void UpdateSoundPosition()
@@ -164,6 +171,8 @@ namespace WickedCrush.GameEntities
                         Die();
                     }
 
+                    DamagePlayerOnTouch();
+
                 }));
             //turn around
             stateList.Add("tree-turn", new State("tree-turn",
@@ -210,6 +219,8 @@ namespace WickedCrush.GameEntities
                         Die();
                     }
 
+                    DamagePlayerOnTouch();
+
                 }));
             stateList.Add("tree-attack-tell", new State("tree-attack-tell",
                 c => sm.previousControlState.name.Equals("tree-attack-tell"),
@@ -241,6 +252,8 @@ namespace WickedCrush.GameEntities
                     {
                         Die();
                     }
+
+                    DamagePlayerOnTouch();
 
                 }));
             stateList.Add("tree-hit", new State("tree-hit",
@@ -311,6 +324,8 @@ namespace WickedCrush.GameEntities
                         sm.currentControlState = sm.control["tree-walk"];
                         sm.previousControlState = sm.control["tree-walk"];
                     }
+
+                    DamagePlayerOnTouch();
                 }));
 
             sm = new StateMachine(stateList);
@@ -343,6 +358,8 @@ namespace WickedCrush.GameEntities
             hp -= dmgAmount;
             hurtFlash = true;
 
+            PlayDamagedSoundEffect();
+
             _cf._damageNumbersList.Add(new DamageNumber((int)((dmgAmount * 50) + (random.NextDouble()-0.5) * 4), pos+offset));
 
             if (atkDir == Direction.Left)
@@ -369,6 +386,22 @@ namespace WickedCrush.GameEntities
 
                 sm.currentControlState = sm.control["tree-hit"];
                 sm.previousControlState = sm.control["tree-hit"];
+            }
+        }
+
+        private void PlayDamagedSoundEffect()
+        {
+            if (random.NextDouble() > 0.5)
+            {
+                bladeStab1 = _sound.getSoundInstance("bladeStab1");
+                bladeStab1.Apply3D(_sound.listener, emitter);
+                bladeStab1.Play();
+            }
+            else
+            {
+                bladeStab2 = _sound.getSoundInstance("bladeStab2");
+                bladeStab2.Apply3D(_sound.listener, emitter);
+                bladeStab2.Play();
             }
         }
 
@@ -402,7 +435,7 @@ namespace WickedCrush.GameEntities
             {
                 _cf.AddCharacterToList(
                         new Fireball(_cf._cm, _cf._gd,
-                            pos + new Vector2(0f, 16f),
+                            pos + new Vector2(0f, 25f),
                             1,
                             1.5f,
                             facingDir,
@@ -413,7 +446,7 @@ namespace WickedCrush.GameEntities
             {
                 _cf.AddCharacterToList(
                         new Fireball(_cf._cm, _cf._gd,
-                            pos + new Vector2(50f, 16f),
+                            pos + new Vector2(50f, 25f),
                             1,
                             1.5f,
                             facingDir,
@@ -471,6 +504,20 @@ namespace WickedCrush.GameEntities
             ttimer.Elapsed += new ElapsedEventHandler(turnTimerUp);
             ttimer.Interval = 800;
             ttimer.Enabled = true;
+        }
+
+        private void DamagePlayerOnTouch()
+        {
+            for (int i = 0; i < collisionList.Count; i++)
+            {
+                if (collisionList[i] is Hero && !collisionList[i].invuln)
+                {
+                    if(this.CheckXDisplacement((Character)collisionList[i])>0)
+                        ((Character)collisionList[i]).TakeDamage(1, 1f, Direction.Left);
+                    else
+                        ((Character)collisionList[i]).TakeDamage(1, 1f, Direction.Right);
+                }
+            }
         }
     }
 }

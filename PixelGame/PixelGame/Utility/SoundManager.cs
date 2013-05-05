@@ -27,7 +27,7 @@ namespace WickedCrush.Utility
             soundsList = new Dictionary<String, SoundEffect>();
             loopingSoundsList = new Dictionary<int, SoundEffectInstance>();
 
-            SoundEffect.DistanceScale = 300f;
+            SoundEffect.DistanceScale = 140f;
 
             _cm = cm;
             
@@ -38,7 +38,10 @@ namespace WickedCrush.Utility
         {
             if (_gameCam != null && listener!=null)
             {
-                listener.Position = _gameCam.cameraPosition;
+                listener.Position = new Vector3(_gameCam.cameraPosition.X, _gameCam.cameraPosition.Y, 0f);
+                //listener.Position.X = _gameCam.cameraPosition.X;
+                //listener.Position = _gameCam.cameraPosition;
+                //listener.Position.Z = 0f;
             }
         }
 
@@ -47,7 +50,10 @@ namespace WickedCrush.Utility
             _gameCam = gameCam;
 
             listener = new AudioListener();
-            listener.Position = gameCam.cameraPosition;
+            //listener.Position = gameCam.cameraPosition;
+            //listener.Position.Z = 0f;
+
+            listener.Position = new Vector3(_gameCam.cameraPosition.X, _gameCam.cameraPosition.Y, 0f);
         }
 
         public void clearList()

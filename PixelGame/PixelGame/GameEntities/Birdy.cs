@@ -115,9 +115,9 @@ namespace WickedCrush.GameEntities
                     this.velocity.Y = 0f;
                     this.accel.X = 0f;
                     this.accel.Y = 0f;
-                    
 
-                    if (underFeetCollisionList.Count > 0)
+
+                    if (collisionUnderFeetSubsetList.Count > 0)
                     {
                         if (velocity.Y <= 0f)
                         {

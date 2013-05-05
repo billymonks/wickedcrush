@@ -62,6 +62,9 @@ namespace WickedCrush
 
         public CharacterFactory cf;
         public Overlord _overlord;
+
+        public Random random;
+        public double modBase = Math.PI;
         #endregion
 
         public Level(Overlord overlord) //gd needs to be removed when this stuff is loaded in the level loader like it should
@@ -86,6 +89,8 @@ namespace WickedCrush
 
             levelCam = new Camera();
             setupCamera();
+
+            random = new Random();
         }
 
         private void setupCamera()
@@ -95,67 +100,6 @@ namespace WickedCrush
             levelCam.cameraTarget.Z = 0f;
             levelCam.SetTarget(hero);
         }
-
-        /*public void saveLevel(String FILE_NAME, String LEVEL_NAME, String LEVEL_AUTHOR)
-        {
-            XDocument doc = new XDocument();
-            XElement rootElement = new XElement("level");
-            XElement attributes = new XElement("attributes");
-            XElement grid = new XElement("grid");
-            XElement background = new XElement("background");
-            XElement foreground = new XElement("foreground");
-            XElement entities = new XElement("entities");
-
-            rootElement.Add(new XAttribute("name", LEVEL_NAME));
-            rootElement.Add(new XAttribute("author", LEVEL_AUTHOR));
-
-            attributes.Add(new XAttribute("scroll", scrollType));
-
-            grid.Add(new XAttribute("cols", sGCD.GetLength(1)),
-                new XAttribute("rows", sGCD.GetLength(0)));
-
-            for (int i = 0; i < sGCD.GetLength(0); i++)
-            {
-                for (int j = 0; j < sGCD.GetLength(1); j++)
-                {
-                    if (sGCD[i, j] != null)
-                        grid.Add(new XElement("coord",
-                            new XAttribute("x", j),
-                            new XAttribute("y", i),
-                            new XAttribute("block", sGCD[i, j].blockName)));
-
-                    if (levelBackgrounds[i, j] != null)
-                        background.Add(new XElement("coord",
-                            new XAttribute("x", j),
-                            new XAttribute("y", i),
-                            new XAttribute("tile", levelBackgrounds[i, j])));
-
-                    if (levelForegrounds[i, j] != null)
-                        foreground.Add(new XElement("coord",
-                            new XAttribute("x", j),
-                            new XAttribute("y", i),
-                            new XAttribute("tile", levelForegrounds[i, j])));
-                }
-            }
-
-            foreach (Character c in characterList)
-            {
-                if (!c.name.Equals("Hero"))
-                    entities.Add(new XElement("entity",
-                        new XAttribute("name", c.name),
-                        new XAttribute("xPos", c.pos.X),
-                        new XAttribute("yPos", c.pos.Y)));
-            }
-
-            rootElement.Add(attributes);
-            rootElement.Add(grid);
-            rootElement.Add(background);
-            rootElement.Add(foreground);
-            rootElement.Add(entities);
-            doc.Add(rootElement);
-
-            doc.Save(FILE_NAME);
-        }*/
 
         public void saveLevel(String FILE_NAME, String LEVEL_NAME, String LEVEL_AUTHOR)
         {
@@ -281,14 +225,6 @@ namespace WickedCrush
                 matList.Add(matSelection(elementName, completeMatList));
             }
 
-/*            sGCD[53, 12] = new Ramp(12 * gridSize, 53 * gridSize, gridSize + 1, gridSize, Corner.BottomLeft, matSelection("stone", completeMatList));
-
-            sGCD[56, 12] = new Ramp(12 * gridSize, 56 * gridSize, gridSize + 1, gridSize, Corner.TopLeft, matSelection("stone", completeMatList));
-
-            sGCD[53, 18] = new Ramp(18 * gridSize, 53 * gridSize, gridSize + 1, gridSize, Corner.BottomRight, matSelection("stone", completeMatList));
-
-            sGCD[56, 18] = new Ramp(18 * gridSize, 56 * gridSize, gridSize + 1, gridSize, Corner.TopRight, matSelection("stone", completeMatList));*/
-
             matList = removeDupesFromMatList(matList);
 
             texList = getTextureList(matList, _overlord._cm);
@@ -357,7 +293,8 @@ namespace WickedCrush
                             _overlord._gd,
                             new Vector2(
                                 float.Parse(e.Attribute("xPos").Value),
-                                float.Parse(e.Attribute("yPos").Value))));
+                                float.Parse(e.Attribute("yPos").Value)),
+                                _overlord._sound));
                         break;
                     case "TreeMob":
                         cf.AddCharacterToList(new TreeMob(
@@ -428,7 +365,8 @@ namespace WickedCrush
                                 float.Parse(e.Attribute("yPos").Value)),
                             cf,
                             hero,
-                            tempDir));
+                            tempDir,
+                            _overlord._sound));
                         break;
                 }
             }
@@ -633,7 +571,18 @@ namespace WickedCrush
                 completeMatList.Add(tempMat);
             }
         }
-       
+
+        private double nextMod(double d)
+        {
+            if (d == 0.0)
+                d = modBase;
+
+            d *= 10.0;
+            d -= Math.Floor(d);
+            
+
+            return d;
+        }
 
         public void createSolidGeomVertices(List<Material> matList) //a doozy
         {
@@ -643,6 +592,7 @@ namespace WickedCrush
             //Block tempBlock;
             //Tile tempTile;
             VertexPositionNormalTextureTangentBinormal[] tempVerts;
+            double modValue = modBase;
 
             int k, l;
 
@@ -652,12 +602,14 @@ namespace WickedCrush
                 {
                     if (sGCD[i, j] != null && sGCD[i, j].type.Equals(EntType.Platform))
                     {
+                        modValue = nextMod(modValue);
+
                         tempMat = matSelection(sGCD[i, j].matName, matList);
 
                         tempVerts = tempMat.getFrontFace(4f); //front face
                         transformSurfaceToPosition(tempVerts, i, j); //transform to proper position
-                        adjustTextureCoordinates(tempVerts, tempMat.textures[0][0][0]); //needs change to choose correct tex and norm
-                        adjustNormalCoordinates(tempVerts, GetFrontTextureName(tempMat, i, j)); //tempMat.textures[48][0][0]);
+                        adjustTextureCoordinates(tempVerts, GetFrontTextureName(tempMat, i, j, Math.Round(modValue, 6))); //needs change to choose correct tex and norm
+                        adjustNormalCoordinates(tempVerts, tempMat.textures[48][0][0]); //tempMat.textures[48][0][0]);
 
                         //add tempVerts
                         for (k = 0; k < tempVerts.Length; k++)
@@ -725,8 +677,8 @@ namespace WickedCrush
 
                         tempVerts = tempMat.getFrontFace(4f, ((Ramp)sGCD[i, j]).corner); //front face
                         transformSurfaceToPosition(tempVerts, i, j); //transform to proper position
-                        adjustTextureCoordinates(tempVerts, tempMat.textures[0][0][0]); //needs change to choose correct tex and norm
-                        adjustNormalCoordinates(tempVerts, GetFrontTextureName(tempMat, i, j)); //tempMat.textures[48][0][0]);
+                        adjustTextureCoordinates(tempVerts, tempMat.textures[16][0][0]); //needs change to choose correct tex and norm
+                        adjustNormalCoordinates(tempVerts, tempMat.textures[48][0][0]); //tempMat.textures[48][0][0]);
 
                         //add tempVerts
                         for (k = 0; k < tempVerts.Length; k++)
@@ -750,82 +702,35 @@ namespace WickedCrush
             solidGeomVertices = tempVertList.ToArray();
         }
 
-        private String GetFrontTextureName(Material m, int x, int y) // needs mod and modular
+        private String GetFrontTextureName(Material m, int x, int y, double mod) // needs mod and modular
         { //sometimes you write good code and sometimes you write bad code
-
+            int choice = 0;
+            int keyChoice = 0;
+            String str;
 
             if (x < sGCD.GetLength(0) - 1 && sGCD[x + 1, y] == null) // up
             {
-                if (y != 0 && sGCD[x, y - 1] == null) // left
-                {
-                    if (y < sGCD.GetLength(1) - 1 && sGCD[x, y + 1] == null) // right
-                    {
-                        if (x != 0 && sGCD[x - 1, y] == null) // down
-                        {
-                            return m.textures[63][0][0];
-                        }
-                        return m.textures[59][0][0];
-                    }
-
-                    if (x != 0 && sGCD[x - 1, y] == null) // down
-                    {
-                        return m.textures[61][0][0];
-                    }
-
-                    return m.textures[54][0][0];
-                }
-
-                if (y < sGCD.GetLength(1) - 1 && sGCD[x, y + 1] == null) // right
-                {
-                    if (x != 0 && sGCD[x - 1, y] == null) // down
-                    {
-                        return m.textures[60][0][0];
-                    }
-                    return m.textures[53][0][0];
-                }
-
-                if (x != 0 && sGCD[x - 1, y] == null) // down
-                {
-                    return m.textures[55][0][0];
-                }
-
-                return m.textures[49][0][0];
+                choice += 1;
             }
 
             if (y < sGCD.GetLength(1) - 1 && sGCD[x, y + 1] == null) // right
             {
-                if (y != 0 && sGCD[x, y - 1] == null) // left
-                {
-                    if (x != 0 && sGCD[x - 1, y] == null) // down
-                    {
-                        return m.textures[62][0][0];
-                    }
-                    return m.textures[57][0][0];
-                }
-                if (x != 0 && sGCD[x - 1, y] == null) // down
-                {
-                    return m.textures[56][0][0];
-                }
-                return m.textures[50][0][0];
+                choice += 2;
             }
 
             if (y != 0 && sGCD[x, y - 1] == null) // left
             {
-                if (x != 0 && sGCD[x - 1, y] == null) // down
-                {
-                    return m.textures[58][0][0];
-                }
-                return m.textures[51][0][0];
+                choice += 4;
             }
 
             if (x != 0 && sGCD[x - 1, y] == null) // down
             {
-                return m.textures[52][0][0];
+                choice += 8;
             }
 
-            
+            keyChoice = (int)Math.Floor(m.textures[choice].Length * mod);
 
-            return m.textures[48][0][0];
+            return m.textures[choice][keyChoice][0];
         }
 
         private String GetTopTextureName(Material m, int x, int y, int z)

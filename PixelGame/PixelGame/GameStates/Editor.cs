@@ -192,17 +192,20 @@ namespace WickedCrush.GameStates
             {
                 if (_controls.GetPressedKey().Length > 0)
                 {
-                    if ((int)_controls.GetPressedKey()[0] >= 65 && (int)_controls.GetPressedKey()[0] <= 90)
+                    if ((int)_controls.GetPressedKey()[0] >= 32 && (int)_controls.GetPressedKey()[0] <= 122)
                         level_name += (char)(int)_controls.GetPressedKey()[0];
 
-                    if ((char)(int)_controls.GetPressedKey()[0] == '\r')
+                    if ((int)_controls.GetPressedKey()[0] == 8 && level_name.Length>0)
+                        level_name = level_name.Substring(0, level_name.Length - 1);
+
+                    if ((char)(int)_controls.GetPressedKey()[0] == '\r' && level_name.Length > 0)
                     {
                         SaveLevel(level_name);
                         saving = false;
                     }
                 }
 
-                if (_controls.StartPressed())
+                if (_controls.StartPressed() && level_name.Length > 0)
                 {
                     SaveLevel(level_name);
                     saving = false;
@@ -243,7 +246,7 @@ namespace WickedCrush.GameStates
             if (saving)
             {
                 sb.Draw(blapck, new Rectangle(10, 950, 1900, 100), Color.Black);
-                sb.DrawString(editorFont1, level_name, new Vector2(10f, 1000f), Color.White);
+                sb.DrawString(editorFont1, ">" + level_name + "_", new Vector2(10f, 950f), Color.White);
             }
             
             sb.Draw(screen_border, new Rectangle(0, 0, 1920, 1080), Color.White);
@@ -591,12 +594,20 @@ namespace WickedCrush.GameStates
             {
                 for (int j = 0; j < tempEntity.size.X; j++)
                 {
-                    if (solidGeom[tempEntity.gridPos.Y - j, tempEntity.gridPos.X + i] != 0)
+                    if (tempEntity.gridPos.X + i < 0
+                        || tempEntity.gridPos.X + i >= solidGeom.GetLength(1)
+                        || tempEntity.gridPos.Y - j < 0
+                        || tempEntity.gridPos.Y - j >= solidGeom.GetLength(0)
+                        || solidGeom[tempEntity.gridPos.Y - j, tempEntity.gridPos.X + i] != 0)
                         return false;
                 }
                 if (tempEntity.connectionPoint.Equals(Direction.Down))
-                    if (solidGeom[tempEntity.gridPos.Y - tempEntity.size.X, tempEntity.gridPos.X + i] != 1
-                        && solidGeom[tempEntity.gridPos.Y - tempEntity.size.X, tempEntity.gridPos.X + i] != 3)
+                    if (tempEntity.gridPos.X + i < 0
+                        || tempEntity.gridPos.X + i >= solidGeom.GetLength(1)
+                        || tempEntity.gridPos.Y - tempEntity.size.X < 0
+                        || tempEntity.gridPos.Y - tempEntity.size.X >= solidGeom.GetLength(0)
+                        ||(solidGeom[tempEntity.gridPos.Y - tempEntity.size.X, tempEntity.gridPos.X + i] != 1
+                        && solidGeom[tempEntity.gridPos.Y - tempEntity.size.X, tempEntity.gridPos.X + i] != 3))
                         return false;
             }
 
@@ -1199,7 +1210,8 @@ namespace WickedCrush.GameStates
 
         private bool isFilled(Point p)
         {
-            if (solidGeom[p.Y, p.X] == 1 || solidGeom[p.Y, p.X] == 3)
+            if ((p.X>=0 && p.X<solidGeom.GetLength(1) && p.Y>=0 && p.Y<solidGeom.GetLength(0)) 
+                && (solidGeom[p.Y, p.X] == 1 || solidGeom[p.Y, p.X] == 3))
                 return true;
             else
                 return false;
@@ -1207,7 +1219,8 @@ namespace WickedCrush.GameStates
 
         private bool isRamp(Point p)
         {
-            if (solidGeom[p.Y, p.X] == 4 || solidGeom[p.Y, p.X] == 5 || solidGeom[p.Y, p.X] == 6 || solidGeom[p.Y, p.X] == 7)
+            if ((p.X>=0 && p.X<solidGeom.GetLength(1) && p.Y>=0 && p.Y<solidGeom.GetLength(0)) 
+                && (solidGeom[p.Y, p.X] == 4 || solidGeom[p.Y, p.X] == 5 || solidGeom[p.Y, p.X] == 6 || solidGeom[p.Y, p.X] == 7))
                 return true;
             else
                 return false;

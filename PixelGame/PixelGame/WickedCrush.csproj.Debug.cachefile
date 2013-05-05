@@ -180,9 +180,6 @@ Content\sounds\metal2.xnb
 Content\sounds\metal3.xnb
 Content\sounds\metal4.xnb
 Content\sounds\metal5.xnb
-Content\sounds\20 Sword or Bayonet Juicy Stab 4 With Short Gush Impact.xnb
-Content\sounds\22 Sword or Bayonet Juicy Stab 6 With Short Gush Impact.xnb
-Content\sounds\23 Sword or Bayonet Juicy Stab 7 Short Gush Impact With Me.xnb
 Content\effects\NormalMapping.xnb
 Content\effects\NormalMappingMultiLights.xnb
 Content\fonts\PreAlphaFont.xnb
@@ -195,6 +192,25 @@ Content\editor_graphics\sketchy_ramp_top_right.xnb
 Content\sounds\Arm Whoosh 02.xnb
 Content\sounds\Arm Whoosh 03.xnb
 Content\sounds\Arm Whoosh 10.xnb
+Content\sounds\bladeStab1.xnb
+Content\sounds\bladeStab2.xnb
+Content\sounds\bladeStab3.xnb
+Content\textures\0.xnb
+Content\textures\1.xnb
+Content\textures\10.xnb
+Content\textures\11.xnb
+Content\textures\12.xnb
+Content\textures\13.xnb
+Content\textures\14.xnb
+Content\textures\15.xnb
+Content\textures\2.xnb
+Content\textures\3.xnb
+Content\textures\4.xnb
+Content\textures\5.xnb
+Content\textures\6.xnb
+Content\textures\7.xnb
+Content\textures\8.xnb
+Content\textures\9.xnb
 Content\animations\arrow.xml
 Content\animations\assplosion.xml
 Content\animations\bird-right.xml

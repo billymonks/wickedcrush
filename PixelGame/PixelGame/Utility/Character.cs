@@ -39,6 +39,8 @@ namespace WickedCrush
 
         public List<Entity> underFeetCollisionList;
 
+        public List<Entity> collisionUnderFeetSubsetList;
+
         public bool walkThrough = false;
         public bool ignorePlatforms = false;
         public bool immobile = false;
@@ -85,6 +87,7 @@ namespace WickedCrush
 
             collisionList = new List<Entity>();
             underFeetCollisionList = new List<Entity>();
+            collisionUnderFeetSubsetList = new List<Entity>();
 
             currentAnimationNorm = null;
 
@@ -112,6 +115,7 @@ namespace WickedCrush
 
             collisionList = new List<Entity>();
             underFeetCollisionList = new List<Entity>();
+            collisionUnderFeetSubsetList = new List<Entity>();
 
             currentAnimationNorm = null;
 
@@ -141,6 +145,7 @@ namespace WickedCrush
 
             collisionList = new List<Entity>();
             underFeetCollisionList = new List<Entity>();
+            collisionUnderFeetSubsetList = new List<Entity>();
 
             currentAnimationNorm = null;
 
@@ -171,6 +176,7 @@ namespace WickedCrush
 
             collisionList = new List<Entity>();
             underFeetCollisionList = new List<Entity>();
+            collisionUnderFeetSubsetList = new List<Entity>();
 
             currentAnimationNorm = null;
 
@@ -202,6 +208,7 @@ namespace WickedCrush
 
             collisionList = new List<Entity>();
             underFeetCollisionList = new List<Entity>();
+            collisionUnderFeetSubsetList = new List<Entity>();
 
             currentAnimationNorm = null;
 

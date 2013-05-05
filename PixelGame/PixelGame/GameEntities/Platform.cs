@@ -105,14 +105,16 @@ namespace WickedCrush.GameEntities
 
             if (e.type.Equals(EntType.Character)
                     && !((Character)e).platformLeft
-                    && (this.hitBox.Contains(((Character)e).floorSensor.start)))
+                    && ((Character)e).leftFloorSensor.collision(this.hitBox))
+                    //&& (this.hitBox.Contains(((Character)e).floorSensor.start)))
             {
                 ((Character)e).platformLeft = true;
             }
 
             if (e.type.Equals(EntType.Character)
                     && !((Character)e).platformRight
-                    && (this.hitBox.Contains(((Character)e).floorSensor.end)))
+                    && ((Character)e).rightFloorSensor.collision(this.hitBox))
+                    //&& (this.hitBox.Contains(((Character)e).floorSensor.end)))
             {
                 ((Character)e).platformRight = true;
             }

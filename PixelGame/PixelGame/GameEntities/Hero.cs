@@ -30,10 +30,14 @@ namespace WickedCrush.GameEntities
         private float blockwalkspeed = 1.8f;
         private float jump_amount = 10f;
 
+        private int airJumpCapacity = 1;
+        private int airJumpCount = 1;
+
         private SoundEffectInstance walkingSound;
         private SoundEffectInstance swordSound1;
         private SoundEffectInstance swordSound2;
         private SoundEffectInstance swordSound3;
+        private SoundEffectInstance shieldSound;
 
         public Hero(ContentManager cm, GraphicsDevice gd, Vector2 pos, CharacterFactory cf, SoundManager sound)
             : base(pos, new Vector2(128f, 129.1f), new Vector2(0.45f, 0.9f), new Vector2(-35.2f, -2f), 128.5f, gd)
@@ -72,36 +76,17 @@ namespace WickedCrush.GameEntities
             _sound.addSound("swordSound1", "Arm Whoosh 02");
             _sound.addSound("swordSound2", "Arm Whoosh 03");
             _sound.addSound("swordSound3", "Arm Whoosh 10");
+            _sound.addSound("shieldSound", "metal2");
 
             walkingSound = _sound.getSoundInstance("footsteps");
             walkingSound.IsLooped = true;
 
-            swordSound1 = _sound.getSoundInstance("swordSound1");
-            swordSound1.IsLooped = false;
-
-            swordSound2 = _sound.getSoundInstance("swordSound2");
-            swordSound2.IsLooped = false;
-
-            swordSound3 = _sound.getSoundInstance("swordSound3");
-            swordSound3.IsLooped = false;
         }
 
         private void CreateAnimationList(ContentManager cm)
         {
             Animation temp;
             animationList = new Dictionary<String, Animation>();
-            //animationList.Add("rad-walk-right", new Animation("rad-walk-right", cm));
-            //animationList.Add("rad-idle-right", new Animation("rad-idle-right", cm));
-            //animationList.Add("rad-jump-up-right", new Animation("rad-jump-up-right", cm));
-            //animationList.Add("rad-jump-down-right", new Animation("rad-jump-down-right", cm));
-
-            //temp = new Animation("assplosion", cm);
-            //temp.loop = false;
-
-            //animationList.Add("explosion", temp);
-
-
-            
 
             animationList.Add("block", new Animation("boy_hero_block", cm)); // block start
             animationList["block"].loop = false;
@@ -129,8 +114,8 @@ namespace WickedCrush.GameEntities
             animationList.Add("melee_3_recovery", new Animation("boy_hero_melee_3_recovery", cm));
             animationList["melee_3_recovery"].loop = false;
 
-            animationList.Add("aerial_attack", new Animation("boy_hero_aerial_attack", cm));
-            animationList["aerial_attack"].loop = false;
+            animationList.Add("jump_attack", new Animation("boy_hero_aerial_attack", cm));
+            animationList["jump_attack"].loop = false;
 
             animationList.Add("hurt", new Animation("boy_hero_hurt", cm));
 
@@ -176,7 +161,7 @@ namespace WickedCrush.GameEntities
                 && !sm.previousControlState.name.Equals("prep_block")
                 && !sm.previousControlState.name.Equals("block_hit_deflect")
                 && !sm.previousControlState.name.Contains("melee")
-                && !sm.previousControlState.name.Equals("aerial_attack")
+                && !sm.previousControlState.name.Equals("jump_attack")
                 && !sm.previousControlState.name.Equals("wall_attack")
                 && !sm.previousControlState.name.Equals("hurt")
                 && _controls.XAxis() == 0f
@@ -197,8 +182,9 @@ namespace WickedCrush.GameEntities
                     
                     this.velocity.X = 0f;
 
-                    if (velocity.Y <= 0f)
+                    if (velocity.Y <= 0f && collisionUnderFeetSubsetList.Count > 0)
                     {
+                        airJumpCount = airJumpCapacity;
                         velocity.Y = 0f;
                         this.pos.Y = GetHighestSensorPoint();
                     }
@@ -209,6 +195,8 @@ namespace WickedCrush.GameEntities
 
                     walkingSound.Stop();
 
+                    
+
                     if (hp <= 0)
                         Die();
 
@@ -218,7 +206,7 @@ namespace WickedCrush.GameEntities
                     && !sm.previousControlState.name.Equals("prep_block")
                     && !sm.previousControlState.name.Equals("block_hit_deflect")
                     && !sm.previousControlState.name.Contains("melee")
-                    && !sm.previousControlState.name.Equals("aerial_attack")
+                    && !sm.previousControlState.name.Equals("jump_attack")
                     && !sm.previousControlState.name.Equals("wall_attack")
                     && !sm.previousControlState.name.Equals("hurt")
                     && Math.Abs(_controls.XAxis()) > 0f
@@ -241,12 +229,26 @@ namespace WickedCrush.GameEntities
                     else
                         this.facingDir = Direction.Left;
 
+                    if(this.velocity.X>0)
+                    currentAnimation.frameInterval = TimeSpan.FromMilliseconds((Math.Abs(runspeed/this.velocity.X)) * 60);
+
                     this.velocity.X = _controls.XAxis() * runspeed;
 
-                    if (velocity.Y <= 0f)
+                    if (sm.previousControlState.Equals(sm.control["run"]))
                     {
-                        velocity.Y = 0f;
-                        this.pos.Y = GetHighestSensorPoint();
+                        if (velocity.Y <= 0f && underFeetCollisionList.Count > 0)
+                        {
+                            velocity.Y = 0f;
+                            this.pos.Y = GetHighestSensorPoint();
+                        }
+                    }
+                    else
+                    {
+                        if (velocity.Y <= 0f && collisionUnderFeetSubsetList.Count > 0)
+                        {
+                            velocity.Y = 0f;
+                            this.pos.Y = GetHighestSensorPoint();
+                        }
                     }
 
                     this.accel.Y = 0f;
@@ -254,6 +256,8 @@ namespace WickedCrush.GameEntities
 
                     //walkingSound.Apply3D(_sound.listener, emitter);
                     //walkingSound.Play();
+
+                    airJumpCount = airJumpCapacity;
 
                     if (hp <= 0)
                         Die();
@@ -264,7 +268,7 @@ namespace WickedCrush.GameEntities
                 && !_controls.JumpReleased()
                 && !sm.previousControlState.name.Equals("block_hit_deflect")
                 && !sm.previousControlState.name.Contains("melee")
-                && !sm.previousControlState.name.Equals("aerial_attack")
+                && !sm.previousControlState.name.Equals("jump_attack")
                 && !sm.previousControlState.name.Equals("wall_attack")
                 && !sm.previousControlState.name.Equals("hurt")
                 && !sm.previousControlState.name.Contains("walljump")
@@ -276,7 +280,15 @@ namespace WickedCrush.GameEntities
                     {
                         currentAnimation.ResetAnimation();
                         SetSmallFrame();
-                    } 
+                    }
+                    else
+                    {
+                        if (_controls.JumpPressed() && airJumpCount > 0)
+                        {
+                            airJumpCount--;
+                            this.velocity.Y = jump_amount;
+                        }
+                    }
                     currentAnimation = animationList["jump"];
 
                     if (_controls.XAxis() > 0f)
@@ -284,7 +296,7 @@ namespace WickedCrush.GameEntities
                     else if (_controls.XAxis() < 0f)
                         this.facingDir = Direction.Left;
 
-                    if (!sm.previousControlState.name.Contains("jump"))
+                    if (!sm.previousControlState.name.Contains("jump") && underFeetCollisionList.Count > 0)
                         this.velocity.Y = jump_amount;
 
                     this.velocity.X = _controls.XAxis() * runspeed;
@@ -300,7 +312,7 @@ namespace WickedCrush.GameEntities
             stateList.Add("jump-cutoff", new State("jump-cutoff",
                 c => underFeetCollisionList.Count == 0
                 && !sm.previousControlState.name.Equals("block_hit_deflect")
-                && !sm.previousControlState.name.Equals("aerial_attack")
+                && !sm.previousControlState.name.Equals("jump_attack")
                 && !sm.previousControlState.name.Equals("wall_attack")
                 && !sm.previousControlState.name.Equals("hurt")
                 && !sm.previousControlState.name.Contains("walljump")
@@ -323,6 +335,12 @@ namespace WickedCrush.GameEntities
 
                     if (!sm.previousControlState.name.Contains("jump"))
                         this.velocity.Y = 7f;
+
+                    if (_controls.JumpPressed() && airJumpCount > 0)
+                    {
+                        airJumpCount--;
+                        this.velocity.Y = jump_amount;
+                    }
 
                     if (velocity.Y > 3f)
                         velocity.Y = 3f;
@@ -388,7 +406,7 @@ namespace WickedCrush.GameEntities
                 && !sm.previousControlState.name.Equals("melee_2")
                 && !sm.previousControlState.name.Equals("melee_3")
                 && !sm.previousControlState.name.Equals("block_hit_deflect")
-                && !sm.previousControlState.name.Equals("aerial_attack")
+                && !sm.previousControlState.name.Equals("jump_attack")
                 && !sm.previousControlState.name.Equals("wall_attack")
                 && !sm.previousControlState.name.Equals("hurt")
                 && !_controls.ActionPressed(),
@@ -418,6 +436,8 @@ namespace WickedCrush.GameEntities
                     else if (_controls.XAxis() > 0f)
                         this.facingDir = Direction.Left;
 
+                    airJumpCount = airJumpCapacity;
+
 
                     if (hp <= 0)
                         Die();
@@ -431,7 +451,7 @@ namespace WickedCrush.GameEntities
                 && !sm.previousControlState.name.Equals("melee_2")
                 && !sm.previousControlState.name.Equals("melee_3")
                 && !sm.previousControlState.name.Equals("block_hit_deflect")
-                && !sm.previousControlState.name.Equals("aerial_attack")
+                && !sm.previousControlState.name.Equals("jump_attack")
                 && !sm.previousControlState.name.Equals("wall_attack")
                 && !sm.previousControlState.name.Equals("hurt")
                 && !_controls.ActionPressed(),
@@ -448,6 +468,12 @@ namespace WickedCrush.GameEntities
                         this.facingDir = Direction.Right;
                     else if (_controls.XAxis() < 0f)
                         this.facingDir = Direction.Left;
+
+                    if (_controls.JumpPressed() && airJumpCount > 0)
+                    {
+                        airJumpCount--;
+                        this.velocity.Y = jump_amount;
+                    }
 
                     this.velocity.X = _controls.XAxis() * runspeed;
 
@@ -467,13 +493,13 @@ namespace WickedCrush.GameEntities
                     && underFeetCollisionList.Count == 0),
                 c => 
                 {
-                    if (currentAnimation != null && !currentAnimation.Equals(animationList["aerial_attack"]))
+                    if (currentAnimation != null && !currentAnimation.Equals(animationList["jump_attack"]))
                     {
                         currentAnimation.ResetAnimation();
                         SetAerialAttackFrame();
                         attackDeployable = true;
                     }
-                    currentAnimation = animationList["aerial_attack"];
+                    currentAnimation = animationList["jump_attack"];
 
                     this.accel.Y = 0f;
                     if (this.velocity.Y < -3f)
@@ -516,8 +542,6 @@ namespace WickedCrush.GameEntities
                                 this));
                         } // end of attack deployment
 
-                        //_sound.getSoundInstance("swordSound2").Play();
-
                         swordSound2 = _sound.getSoundInstance("swordSound2");
                         swordSound2.Apply3D(_sound.listener, emitter);
                         swordSound2.Play();
@@ -538,22 +562,22 @@ namespace WickedCrush.GameEntities
 
                 }));
 
-            stateList.Add("aerial_attack", new State("aerial_attack",
+            stateList.Add("jump_attack", new State("jump_attack",
                 c => (((sm.previousControlState.name.Equals("fall")
                     || sm.previousControlState.name.Equals("jump-cutoff")
                     || sm.previousControlState.name.Equals("jump"))
                     && _controls.ActionPressed())
-                    || sm.previousControlState.name.Equals("aerial_attack"))
+                    || sm.previousControlState.name.Equals("jump_attack"))
                     && underFeetCollisionList.Count == 0,
                     c =>
                     {
-                        if (currentAnimation != null && !currentAnimation.Equals(animationList["aerial_attack"]))
+                        if (currentAnimation != null && !currentAnimation.Equals(animationList["jump_attack"]))
                         {
                             currentAnimation.ResetAnimation();
                             SetAerialAttackFrame();
                             attackDeployable = true;
                         }
-                        currentAnimation = animationList["aerial_attack"];
+                        currentAnimation = animationList["jump_attack"];
 
                         this.velocity.X = _controls.XAxis() * runspeed;
 
@@ -590,8 +614,6 @@ namespace WickedCrush.GameEntities
                                     this));
                             } // end of attack deployment
 
-                            //_sound.getSoundInstance("swordSound2").Play();
-
                             swordSound2 = _sound.getSoundInstance("swordSound2");
                             swordSound2.Apply3D(_sound.listener, emitter);
                             swordSound2.Play();
@@ -620,6 +642,10 @@ namespace WickedCrush.GameEntities
                     {
                         currentAnimation.ResetAnimation();
                         SetSmallFrame();
+
+                        shieldSound = _sound.getSoundInstance("shieldSound");
+                        shieldSound.Apply3D(_sound.listener, emitter);
+                        shieldSound.Play();
                     } 
                     currentAnimation = animationList["block"];
 
@@ -658,7 +684,7 @@ namespace WickedCrush.GameEntities
                     currentAnimation = animationList["block_held"];
 
                     this.velocity.X = 0f;
-                    if (velocity.Y <= 0f)
+                    if (velocity.Y <= 0f && collisionUnderFeetSubsetList.Count > 0)
                     {
                         velocity.Y = 0f;
                         this.pos.Y = GetHighestSensorPoint();
@@ -700,7 +726,7 @@ namespace WickedCrush.GameEntities
 
                     this.accel.Y = 0f;
 
-                    if (underFeetCollisionList.Count > 0)
+                    if (collisionUnderFeetSubsetList.Count > 0)
                     {
                         if (velocity.Y <= 0f)
                         {
@@ -769,7 +795,7 @@ namespace WickedCrush.GameEntities
                     }
 
                     this.velocity.X = _controls.XAxis() * blockwalkspeed;
-                    if (velocity.Y <= 0f)
+                    if (velocity.Y <= 0f && collisionUnderFeetSubsetList.Count > 0)
                     {
                         velocity.Y = 0f;
                         this.pos.Y = GetHighestSensorPoint();
@@ -825,7 +851,7 @@ namespace WickedCrush.GameEntities
                                     this));
                             } // end of attack deployment
 
-                            //_sound.getSoundInstance("swordSound1").Play();
+                            swordSound1 = _sound.getSoundInstance("swordSound1");
                             swordSound1.Apply3D(_sound.listener, emitter);
                             swordSound1.Play();
                         }
@@ -847,7 +873,7 @@ namespace WickedCrush.GameEntities
                     this.accel.X = 0f;
                     this.accel.Y = 0f;
 
-                    if (underFeetCollisionList.Count > 0)
+                    if (collisionUnderFeetSubsetList.Count > 0)
                     {
                         if (velocity.Y <= 0f)
                         {
@@ -906,6 +932,7 @@ namespace WickedCrush.GameEntities
                                     this));
                             } // end of attack deployment
 
+                            swordSound1 = _sound.getSoundInstance("swordSound1");
                             swordSound1.Apply3D(_sound.listener, emitter);
                             swordSound1.Play();
                             //_sound.getSoundInstance("swordSound1").Play();
@@ -939,7 +966,7 @@ namespace WickedCrush.GameEntities
                     
                     this.accel.Y = 0f;
 
-                    if (underFeetCollisionList.Count > 0)
+                    if (collisionUnderFeetSubsetList.Count > 0)
                     {
                         if (velocity.Y <= 0f)
                         {
@@ -977,7 +1004,7 @@ namespace WickedCrush.GameEntities
                     this.accel.X = 0f;
                     this.accel.Y = 0f;
 
-                    if (underFeetCollisionList.Count > 0)
+                    if (collisionUnderFeetSubsetList.Count > 0)
                     {
                         if (velocity.Y <= 0f)
                         {
@@ -1040,6 +1067,7 @@ namespace WickedCrush.GameEntities
                                 this));
                         } // end of attack deployment
 
+                        swordSound2 = _sound.getSoundInstance("swordSound2");
                         swordSound2.Apply3D(_sound.listener, emitter);
                         swordSound2.Play();
                         //_sound.getSoundInstance("swordSound2").Play();
@@ -1053,7 +1081,7 @@ namespace WickedCrush.GameEntities
                     this.accel.X = 0f;
                     this.accel.Y = 0f;
 
-                    if (underFeetCollisionList.Count > 0)
+                    if (collisionUnderFeetSubsetList.Count > 0)
                     {
                         if (velocity.Y <= 0f)
                         {
@@ -1091,7 +1119,7 @@ namespace WickedCrush.GameEntities
                     this.accel.X = 0f;
                     this.accel.Y = 0f;
 
-                    if (underFeetCollisionList.Count > 0)
+                    if (collisionUnderFeetSubsetList.Count > 0)
                     {
                         if (velocity.Y <= 0f)
                         {
@@ -1151,6 +1179,8 @@ namespace WickedCrush.GameEntities
                         } // end of attack deployment
 
                         //swordSound3.Play();
+                        //swordSound3.Stop();
+                        swordSound3 = _sound.getSoundInstance("swordSound3");
                         swordSound3.Apply3D(_sound.listener, emitter);
                         swordSound3.Play();
                         //_sound.getSoundInstance("swordSound3").Play();
@@ -1173,7 +1203,7 @@ namespace WickedCrush.GameEntities
                     this.accel.X = 0f;
                     this.accel.Y = 0f;
 
-                    if (underFeetCollisionList.Count > 0)
+                    if (collisionUnderFeetSubsetList.Count > 0)
                     {
                         if (velocity.Y <= 0f)
                         {
@@ -1212,7 +1242,7 @@ namespace WickedCrush.GameEntities
                     this.accel.X = 0f;
                     this.accel.Y = 0f;
 
-                    if (underFeetCollisionList.Count > 0)
+                    if (collisionUnderFeetSubsetList.Count > 0)
                     {
                         if (velocity.Y <= 0f)
                         {
@@ -1256,7 +1286,7 @@ namespace WickedCrush.GameEntities
                     }
                     this.accel.Y = 0f;
 
-                    if (underFeetCollisionList.Count > 0)
+                    if (collisionUnderFeetSubsetList.Count > 0)
                     {
                         if (velocity.Y <= 0f)
                         {
@@ -1293,16 +1323,11 @@ namespace WickedCrush.GameEntities
         public override void StopSoundInstances()
         {
             walkingSound.Stop();
-            //swordSound1.Stop();
-            //swordSound2.Stop();
-            //swordSound3.Stop();
         }
 
         public override void AttackCallback()
         {
             base.AttackCallback();
-
-            //this.velocity.Y = 0;
         }
 
         private void Die() //can't be removing the hero, need death animation
