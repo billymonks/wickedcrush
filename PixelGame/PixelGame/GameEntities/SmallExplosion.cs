@@ -40,13 +40,13 @@ namespace WickedCrush.GameEntities
 
             if (_cf != null)
                 _cf.AddLightToList(new GlowingPointLight(this,
-                    240f,
+                    275f,
                     new Vector4(1f, 0.27f, 0f, 1f),
                     new Vector4(1f, 0.55f, 0f, 1f),
                     450f,
-                    0.1f,
+                    0.5f,
                     new Vector2(52.5f, 52.5f),
-                    0.4f,
+                    0.5f,
                     200));
         }
         private void CreateAnimationList(ContentManager cm)

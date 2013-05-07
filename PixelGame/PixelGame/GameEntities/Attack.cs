@@ -25,6 +25,7 @@ namespace WickedCrush.GameEntities
             this.atkDir = atkDir;
             this.creator = creator;
             this.callBackOnHit = false;
+            this.invuln = true;
             CreateCharacter(cm);
         }
 
@@ -37,6 +38,7 @@ namespace WickedCrush.GameEntities
             this.atkDir = atkDir;
             this.creator = creator;
             this.callBackOnHit = callBack;
+            this.invuln = true;
             CreateCharacter(cm);
         }
 

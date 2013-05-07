@@ -26,6 +26,7 @@ namespace WickedCrush
         public Color bgColor;
 
         public List<PointLight> lightList;
+        public List<PointLight> optimizedLightList;
 
         public List<DamageNumber> floatingNumList;
 
@@ -39,14 +40,15 @@ namespace WickedCrush
 
         public String[,] levelBackgrounds;
         public String[,] levelForegrounds;
-        public VertexPositionNormalTextureTangentBinormal[] solidGeomVertices;
+        public List<VertexPositionNormalTextureTangentBinormal> solidGeomVertices;
+        public List<VertexPositionNormalTextureTangentBinormal>[,] gridVertices;
 
         public VertexBuffer levelVertexBuffer;
 
         public Vector4 ambientLightColor = new Vector4(1f, 1f, 1f, 1f);
         public Vector4 diffuseLightColor = new Vector4(0.6f, 0.8f, 1f, 1f);
         public Vector4 specularLightColor = new Vector4(0.6f, 0.6f, 0.8f, 0.5f);
-        public float ambientIntensity = 0.175f;
+        public float ambientIntensity = 0.015f; //0.275f;
         public float diffuseIntensity = 0.5f;
 
         public Vector4 baseColor = new Vector4(0.05f, 0.05f, 0.1f, 1f);
@@ -72,6 +74,7 @@ namespace WickedCrush
             name = "";
             characterList = new List<Character>();
             lightList = new List<PointLight>();
+            optimizedLightList = new List<PointLight>();
             floatingNumList = new List<DamageNumber>();
             cf = new CharacterFactory(characterList, lightList, floatingNumList, overlord);
             bgColor = new Color(0.05f, 0.05f, 0.1f);
@@ -81,7 +84,8 @@ namespace WickedCrush
             sGCD = new Platform[0, 0];
             levelBackgrounds = new String[0, 0];
             levelForegrounds = new String[0, 0];
-            solidGeomVertices = new VertexPositionNormalTextureTangentBinormal[0];
+            solidGeomVertices = new List<VertexPositionNormalTextureTangentBinormal>();
+            
 
             _overlord = overlord;
 
@@ -95,10 +99,42 @@ namespace WickedCrush
 
         private void setupCamera()
         {
-            levelCam.cameraPosition.Z = 880f;
+            //levelCam.cameraPosition.Z = 880f;
             //levelCam.cameraPosition.Z = 720f;
             levelCam.cameraTarget.Z = 0f;
+            levelCam.setCameraDepth(880f);
             levelCam.SetTarget(hero);
+        }
+
+        private void initializeGridVerts()
+        {
+            if (gridVertices == null)
+            {
+                gridVertices = new List<VertexPositionNormalTextureTangentBinormal>[sGCD.GetLength(0), sGCD.GetLength(1)];
+
+                for (int i = 0; i < gridVertices.GetLength(0); i++)
+                {
+                    for (int j = 0; j < gridVertices.GetLength(1); j++)
+                    {
+                        gridVertices[i, j] = new List<VertexPositionNormalTextureTangentBinormal>();
+                    }
+                }
+            }
+            else
+            {
+                clearGridVerts();
+            }
+        }
+
+        private void clearGridVerts()
+        {
+            for(int i = 0; i < gridVertices.GetLength(0); i++)
+            {
+                for (int j = 0; j < gridVertices.GetLength(1); j++)
+                {
+                    gridVertices[i, j].Clear();
+                }
+            }
         }
 
         public void saveLevel(String FILE_NAME, String LEVEL_NAME, String LEVEL_AUTHOR)
@@ -111,8 +147,6 @@ namespace WickedCrush
 
             rootElement.Add(new XAttribute("name", LEVEL_NAME));
             rootElement.Add(new XAttribute("author", LEVEL_AUTHOR));
-
-            //attributes.Add(new XAttribute("scroll", scrollType));
 
             grid.Add(new XAttribute("cols", sGCD.GetLength(1)),
                 new XAttribute("rows", sGCD.GetLength(0)));
@@ -167,7 +201,6 @@ namespace WickedCrush
 
                 _overlord._sound.addSound("cave_ambient", "17729__royal__cavern-wind");
                 _overlord._sound.playAmbientLoop("cave_ambient");
-                // not while i'm testing please stop
             }
 
             getCompleteMatList(completeMatList);
@@ -233,18 +266,21 @@ namespace WickedCrush
             solidGeomTex = compileTex(_overlord._cm, _overlord._gd, texList, out texLookupList, 64);
             solidGeomNorm = compileTex(_overlord._cm, _overlord._gd, normList, out normLookupList, 64);
 
+            initializeGridVerts();
+
             createSolidGeomVertices(matList);
 
-            if (solidGeomVertices.Length > 0)
-            {
-                levelVertexBuffer = new VertexBuffer(_overlord._gd, typeof(VertexPositionNormalTextureTangentBinormal), solidGeomVertices.Length, BufferUsage.None);
-                levelVertexBuffer.SetData(solidGeomVertices);
-            }
+            //if (solidGeomVertices.Count > 0)
+            //{
+                //levelVertexBuffer = new VertexBuffer(_overlord._gd, typeof(VertexPositionNormalTextureTangentBinormal), solidGeomVertices.Count, BufferUsage.None);
+                //levelVertexBuffer.SetData(solidGeomVertices.ToArray());
+            //}
 
             //characterList = new List<Character>();
 
             characterList.Clear();
             lightList.Clear();
+            optimizedLightList.Clear();
             floatingNumList.Clear();
 
             cf.AddCharacterToList(hero);
@@ -383,6 +419,7 @@ namespace WickedCrush
             name = "";
             characterList = new List<Character>();
             lightList = new List<PointLight>();
+            optimizedLightList = new List<PointLight>();
             floatingNumList = new List<DamageNumber>();
             cf = new CharacterFactory(characterList, lightList, floatingNumList, _overlord);
 
@@ -393,7 +430,8 @@ namespace WickedCrush
             sGCD = new Platform[0, 0];
             levelBackgrounds = new String[0, 0];
             levelForegrounds = new String[0, 0];
-            solidGeomVertices = new VertexPositionNormalTextureTangentBinormal[0];
+            solidGeomVertices.Clear();
+            clearGridVerts();
 
             hero.RestoreHero();
             //hero = new Hero(cm, gd, new Vector2(-256f, 800f));
@@ -596,6 +634,8 @@ namespace WickedCrush
 
             int k, l;
 
+            clearGridVerts();
+
             for (int i = 0; i < sGCD.GetLength(0); i++)
             {
                 for (int j = 0; j < sGCD.GetLength(1); j++)
@@ -609,11 +649,15 @@ namespace WickedCrush
                         tempVerts = tempMat.getFrontFace(4f); //front face
                         transformSurfaceToPosition(tempVerts, i, j); //transform to proper position
                         adjustTextureCoordinates(tempVerts, GetFrontTextureName(tempMat, i, j, Math.Round(modValue, 6))); //needs change to choose correct tex and norm
-                        adjustNormalCoordinates(tempVerts, tempMat.textures[48][0][0]); //tempMat.textures[48][0][0]);
+                        //adjustNormalCoordinates(tempVerts, tempMat.textures[48][0][0]); //tempMat.textures[48][0][0]);
+                        adjustNormalCoordinates(tempVerts, tempMat.textures[80][0][0]);
 
                         //add tempVerts
                         for (k = 0; k < tempVerts.Length; k++)
-                            tempVertList.Add(tempVerts[k]);
+                        {
+                            gridVertices[i, j].Add(tempVerts[k]);
+                        }
+                            //tempVertList.Add(tempVerts[k]);
 
                         if (!_overlord.isOrtho)
                         {
@@ -627,7 +671,10 @@ namespace WickedCrush
 
                                     //add tempVerts
                                     for (k = 0; k < tempVerts.Length; k++)
-                                        tempVertList.Add(tempVerts[k]);
+                                    {
+                                        gridVertices[i, j].Add(tempVerts[k]);
+                                    }
+                                        //tempVertList.Add(tempVerts[k]);
                                 }
 
                             if (j != 0 && sGCD[i, j - 1] == null)
@@ -640,7 +687,10 @@ namespace WickedCrush
 
                                     //add tempVerts
                                     for (k = 0; k < tempVerts.Length; k++)
-                                        tempVertList.Add(tempVerts[k]);
+                                    {
+                                        gridVertices[i, j].Add(tempVerts[k]);
+                                    }
+                                        //tempVertList.Add(tempVerts[k]);
                                 }
 
                             if (j != sGCD.GetLength(1) - 1 && sGCD[i, j + 1] == null) //note
@@ -653,7 +703,10 @@ namespace WickedCrush
 
                                     //add tempVerts
                                     for (k = 0; k < tempVerts.Length; k++)
-                                        tempVertList.Add(tempVerts[k]);
+                                    {
+                                        gridVertices[i, j].Add(tempVerts[k]);
+                                    }
+                                        //tempVertList.Add(tempVerts[k]);
                                 }
 
                             if (i != 0 && sGCD[i - 1, j] == null)
@@ -666,7 +719,10 @@ namespace WickedCrush
 
                                     //add tempVerts
                                     for (k = 0; k < tempVerts.Length; k++)
-                                        tempVertList.Add(tempVerts[k]);
+                                    {
+                                        gridVertices[i, j].Add(tempVerts[k]);
+                                    }
+                                        //tempVertList.Add(tempVerts[k]);
                                 }
                         }
 
@@ -678,28 +734,47 @@ namespace WickedCrush
                         tempVerts = tempMat.getFrontFace(4f, ((Ramp)sGCD[i, j]).corner); //front face
                         transformSurfaceToPosition(tempVerts, i, j); //transform to proper position
                         adjustTextureCoordinates(tempVerts, tempMat.textures[16][0][0]); //needs change to choose correct tex and norm
-                        adjustNormalCoordinates(tempVerts, tempMat.textures[48][0][0]); //tempMat.textures[48][0][0]);
+                        adjustNormalCoordinates(tempVerts, tempMat.textures[80][0][0]); //tempMat.textures[48][0][0]);
 
                         //add tempVerts
                         for (k = 0; k < tempVerts.Length; k++)
-                            tempVertList.Add(tempVerts[k]);
+                        {
+                            gridVertices[i, j].Add(tempVerts[k]);
+                        }
+                            //tempVertList.Add(tempVerts[k]);
+
+                        //background
+                        tempMat = matList[0];
+                        tempVerts = tempMat.getFrontFace(-1f); //front face
+                        transformSurfaceToPosition(tempVerts, i, j); //transform to proper position
+                        adjustTextureCoordinates(tempVerts, tempMat.textures[17][0][0]); //needs change to choose correct tex and norm
+                        adjustNormalCoordinates(tempVerts, tempMat.textures[80][0][0]);
+
+                        //add tempVerts
+                        for (k = 0; k < tempVerts.Length; k++)
+                        {
+                            gridVertices[i, j].Add(tempVerts[k]);
+                        }
+                            //tempVertList.Add(tempVerts[k]);
                     }
                     else //background
                     {
-                        /*tempMat = matList[0];
-                        tempVerts = tempMat.getFrontFace(0f); //front face
+                        tempMat = matList[0];
+                        tempVerts = tempMat.getFrontFace(-1f); //front face
                         transformSurfaceToPosition(tempVerts, i, j); //transform to proper position
-                        adjustTextureCoordinates(tempVerts, tempMat.textures[0][0][0]); //needs change to choose correct tex and norm
-                        adjustNormalCoordinates(tempVerts, tempMat.textures[48][0][0]);
+                        adjustTextureCoordinates(tempVerts, tempMat.textures[17][0][0]); //needs change to choose correct tex and norm
+                        adjustNormalCoordinates(tempVerts, tempMat.textures[80][0][0]);
 
                         //add tempVerts
                         for (k = 0; k < tempVerts.Length; k++)
-                            tempVertList.Add(tempVerts[k]);*/
+                        {
+                            gridVertices[i, j].Add(tempVerts[k]);
+                        }
+                            //tempVertList.Add(tempVerts[k]);
                     }
                 }
             }
-
-            solidGeomVertices = tempVertList.ToArray();
+            //solidGeomVertices = tempVertList.ToArray();
         }
 
         private String GetFrontTextureName(Material m, int x, int y, double mod) // needs mod and modular

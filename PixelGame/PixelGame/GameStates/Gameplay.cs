@@ -229,6 +229,67 @@ namespace WickedCrush.GameStates
             
         }
 
+        private void GetLevelBatch()
+        {
+            currentLevel.solidGeomVertices.Clear();
+
+            int x = (int)(currentLevel.levelCam.cameraPosition.X / ((float)currentLevel.gridSize));
+            int y = (int)(currentLevel.levelCam.cameraPosition.Y / ((float)currentLevel.gridSize));
+            int left, right, top, bottom;
+
+            x = RestrictToGridXBounds(x);
+            y = RestrictToGridYBounds(y);
+
+            top = y - 6;
+            bottom = y + 6;
+            left = x - 10;
+            right = x + 10;
+
+            left = RestrictToGridXBounds(left);
+            right = RestrictToGridXBounds(right);
+            top = RestrictToGridYBounds(top);
+            bottom = RestrictToGridYBounds(bottom);
+
+            for (int i = left; i <= right; i++)
+            {
+                for (int j = top; j <= bottom; j++)
+                {
+                    foreach (VertexPositionNormalTextureTangentBinormal v in currentLevel.gridVertices[j, i])
+                    {
+                        currentLevel.solidGeomVertices.Add(v);
+                    }
+                }
+            }
+
+            if (currentLevel.solidGeomVertices.Count > 0)
+            {
+                currentLevel.levelVertexBuffer = new DynamicVertexBuffer(_overlord._gd, typeof(VertexPositionNormalTextureTangentBinormal), currentLevel.solidGeomVertices.Count, BufferUsage.None);
+                currentLevel.levelVertexBuffer.SetData(currentLevel.solidGeomVertices.ToArray());
+            }
+
+        }
+
+        private int RestrictToGridXBounds(int x)
+        {
+            if (x < 0)
+                x = 0;
+
+            if (x >= currentLevel.gridVertices.GetLength(1))
+                x = currentLevel.gridVertices.GetLength(1);
+
+            return x;
+        }
+        private int RestrictToGridYBounds(int y)
+        {
+            if (y < 0)
+                y = 0;
+
+            if (y >= currentLevel.gridVertices.GetLength(0))
+                y = currentLevel.gridVertices.GetLength(0);
+
+            return y;
+        }
+
         public void Draw(GameTime gameTime)
         {
             _overlord._gd.Clear(currentLevel.bgColor);
@@ -242,7 +303,17 @@ namespace WickedCrush.GameStates
             //normalMappingEffect.Parameters["PointLightPosition"].SetValue(new Vector3(currentLevel.hero.pos.X + 40f, currentLevel.hero.pos.Y + 50f, 300f));
             //normalMappingEffect.Parameters["PointLightRange"].SetValue(400f);
 
-            if (currentLevel.solidGeomVertices.Length > 0)
+            currentLevel.optimizedLightList.Clear();
+            foreach (PointLight p in currentLevel.lightList)
+            {
+                if (Math.Abs(p.pos.X - currentLevel.levelCam.cameraPosition.X)-p.range < 720f
+                    && Math.Abs(p.pos.Y - currentLevel.levelCam.cameraPosition.Y) - p.range < 480f)
+                    currentLevel.optimizedLightList.Add(p);
+            }
+
+            GetLevelBatch();
+
+            if (currentLevel.solidGeomVertices.Count > 0)
             {
                 normalMappingEffect.Parameters["ColorMap"].SetValue(currentLevel.solidGeomTex);
                 normalMappingEffect.Parameters["NormalMap"].SetValue(currentLevel.solidGeomNorm);
@@ -252,17 +323,19 @@ namespace WickedCrush.GameStates
 
                 normalMappingEffect.CurrentTechnique = normalMappingEffect.Techniques["MultiPassLight"]; //geom has normal map (some sprites do not)
 
+                
+
                 _overlord._gd.SetVertexBuffer(currentLevel.levelVertexBuffer);
 
                 _overlord._gd.BlendState = BlendState.Opaque;
 
                 normalMappingEffect.CurrentTechnique.Passes["Ambient"].Apply();
-                _overlord._gd.DrawPrimitives(PrimitiveType.TriangleList, 0, currentLevel.solidGeomVertices.Length / 3);
+                _overlord._gd.DrawPrimitives(PrimitiveType.TriangleList, 0, currentLevel.solidGeomVertices.Count / 3);
 
 
                 _overlord._gd.BlendState = BlendState.Additive;
                 //normalMappingEffect.CurrentTechnique.Passes["Point"].Apply();
-                foreach (PointLight p in currentLevel.lightList)
+                foreach (PointLight p in currentLevel.optimizedLightList)
                 {
                     normalMappingEffect.Parameters["DiffuseColor"].SetValue(p.diffuseColor);
                     normalMappingEffect.Parameters["DiffuseIntensity"].SetValue(p.intensity);
@@ -270,7 +343,7 @@ namespace WickedCrush.GameStates
                     normalMappingEffect.Parameters["PointLightPosition"].SetValue(p.pos);
                     normalMappingEffect.Parameters["PointLightRange"].SetValue(p.range);
                     normalMappingEffect.CurrentTechnique.Passes["Point"].Apply();
-                    _overlord._gd.DrawPrimitives(PrimitiveType.TriangleList, 0, currentLevel.solidGeomVertices.Length / 3);
+                    _overlord._gd.DrawPrimitives(PrimitiveType.TriangleList, 0, currentLevel.solidGeomVertices.Count / 3);
                     
                 }
 
@@ -278,7 +351,7 @@ namespace WickedCrush.GameStates
 
             foreach (Character c in currentLevel.characterList)
             {
-                if (c.currentAnimation != null)
+                if (c.currentAnimation != null && c.CalculateXDistance(currentLevel.levelCam.cameraPosition.X) < 720f && c.CalculateYDistance(currentLevel.levelCam.cameraPosition.Y) < 480f )
                 {
                     normalMappingEffect.Parameters["ColorMap"].SetValue(c.currentAnimation.animationSheet);
 
@@ -320,7 +393,7 @@ namespace WickedCrush.GameStates
                     //normalMappingEffect.CurrentTechnique.Passes["Point"].Apply();
 
                     _overlord._gd.BlendState = BlendState.Additive;
-                    foreach (PointLight p in currentLevel.lightList)
+                    foreach (PointLight p in currentLevel.optimizedLightList)
                     {
                         normalMappingEffect.Parameters["DiffuseColor"].SetValue(p.diffuseColor);
                         normalMappingEffect.Parameters["DiffuseIntensity"].SetValue(p.intensity);

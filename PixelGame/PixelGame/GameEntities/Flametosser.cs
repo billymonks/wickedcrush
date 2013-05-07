@@ -18,7 +18,7 @@ namespace WickedCrush.GameEntities
         private Timer timer;
 
         public Flametosser(ContentManager cm, GraphicsDevice gd, Vector2 pos, CharacterFactory cf, Direction d)
-            : base(pos, new Vector2(32f, 32f), new Vector2(1f, 1f), new Vector2(0f, 0f), 128f, gd)
+            : base(pos, new Vector2(64f, 64f), new Vector2(1f, 1f), new Vector2(0f, 0f), 128f, gd)
         {
             _cf = cf;
             facingDir = d;

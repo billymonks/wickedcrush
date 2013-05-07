@@ -81,7 +81,7 @@
   <texture index="77" key="0">13</texture>
   <texture index="78" key="0">14</texture>
   <texture index="79" key="0">15</texture>
-  <texture index="80" key="0">0</texture>
+  <texture index="80" key="0">block_side_full_edges</texture>
   <texture index="81" key="0">1</texture>
   <texture index="82" key="0">2</texture>
   <texture index="83" key="0">3</texture>

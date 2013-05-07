@@ -43,8 +43,8 @@ namespace WickedCrush.GameEntities
                     440f,
                     new Vector4(1f, 0.47f, 0f, 1f),
                     new Vector4(1f, 0.85f, 0f, 1f),
-                    550f,
-                    0.1f,
+                    650f,
+                    0.5f,
                     new Vector2(52.5f, 52.5f),
                     0.6f,
                     300));

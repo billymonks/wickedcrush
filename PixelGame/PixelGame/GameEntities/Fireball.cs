@@ -42,6 +42,7 @@ namespace WickedCrush.GameEntities
             hp = 0;
             name = "Fireball";
             walkThrough = true;
+            invuln = true;
             //ignorePlatforms = true;
             //bright = true;
 
@@ -58,13 +59,13 @@ namespace WickedCrush.GameEntities
 
             if (_cf != null)
                 _cf.AddLightToList(new FlickeringPointLight(this,
-                    175f,
+                    275f,
                     new Vector4(1f, 0.27f, 0f, 1f),
                     new Vector4(1f, 0.55f, 0f, 1f),
-                    300f,
+                    550f,
                     0.5f,
                     new Vector2(20f, 20f),
-                    0.15f));
+                    0.10f));
         }
 
         public void CreateAnimationList(ContentManager cm)
@@ -104,10 +105,13 @@ namespace WickedCrush.GameEntities
                     {
                         if (ch.type.Equals(EntType.Character))
                         {
+                            if (!ch.Equals(creator))
+                            {
+                                readyForRemoval = true;
+                            }
                             if (!ch.invuln && !ch.Equals(creator))
                             {
                                 ((Character)ch).TakeDamage(dmgAmount, force, atkDir);
-                                readyForRemoval = true;
                             }
                         }
                         else

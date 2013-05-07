@@ -1299,6 +1299,9 @@ namespace WickedCrush.GameEntities
                         ApplyGravity();
                     }
 
+                    if (hp <= 0)
+                        Die();
+
                 }));
             stateList.Add("dead", new State("dead",
                 c => true,

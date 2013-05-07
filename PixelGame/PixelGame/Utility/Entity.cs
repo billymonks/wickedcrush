@@ -69,5 +69,15 @@ namespace WickedCrush
             return (float)Math.Sqrt(Math.Pow((double)(this.pos.X - e.pos.X), 2.0) + Math.Pow((double)(this.pos.Y - e.pos.Y), 2.0));
         }
 
+        public float CalculateXDistance(float f)
+        {
+            return Math.Abs((pos.X - offset.X) - f);
+        }
+
+        public float CalculateYDistance(float f)
+        {
+            return Math.Abs((pos.Y - offset.Y) - f);
+        }
+
     }
 }
